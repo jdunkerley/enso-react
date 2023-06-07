@@ -1,0 +1,12 @@
+.nodeDiv {
+    font-family: 'M-PLUS-1 Code', monospace;
+    font-size: 12px;
+    background-color: #357AB9;
+    color: white;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    min-height: 20px;
+    display: inline;
+    vertical-align: middle;
+}
