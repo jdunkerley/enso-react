@@ -50,7 +50,7 @@ jobs:
       - name: Build Project
         run: yarn build
         env:
-            PUBLIC_URL: /scythe-picker/
+            PUBLIC_URL: /enso-react/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
