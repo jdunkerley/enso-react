@@ -17,15 +17,15 @@ export default class FunctionGrouping {
     static getGrouping(namespace: string, type: string, name: string): FunctionGrouping {
         return FUNCTION_GROUPINGS.find((functionGrouping: FunctionGrouping) => {
             return functionGrouping.namespace === namespace && functionGrouping.type === type && functionGrouping.name === name
-        }) || new FunctionGrouping(namespace, type, name, DEFAULT)
+        }) || new FunctionGrouping("", "", "", DEFAULT)
     }
 }
 
 export const FUNCTION_GROUPINGS: FunctionGrouping[] = functionGroupings.map((functionGrouping: any) => {
     return new FunctionGrouping(
-        functionGrouping.namespace,
+        functionGrouping.module,
         functionGrouping.type,
         functionGrouping.name,
-        getGrouping(functionGrouping.grouping)
+        getGrouping(functionGrouping.group)
     )
 })

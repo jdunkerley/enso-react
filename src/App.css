@@ -36,3 +36,8 @@
     transform: rotate(360deg);
   }
 }
+
+div.matchesList {
+  max-height: 110px;
+  overflow-y: scroll;
+}

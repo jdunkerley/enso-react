@@ -892,7 +892,7 @@
     {"module": "Standard.Base.Random", "type": "", "name": "random_indices", "group": ""},
     {"module": "Standard.Base.Data.Statistics", "type": "Statistic", "name": "rank_data", "group": ""},
     {"module": "Standard.Base.System.File", "type": "File", "name": "read", "group": ""},
-    {"module": "Standard.Base.Data", "type": "", "name": "read", "group": ""},
+    {"module": "Standard.Base.Data", "type": "", "name": "read", "group": "Input / Output"},
     {"module": "Standard.Database.Data.Column", "type": "Column", "name": "read", "group": ""},
     {"module": "Standard.Database.Data.Table", "type": "Table", "name": "read", "group": ""},
     {"module": "Standard.Database.Internal.Postgres.Postgres_Connection", "type": "Postgres_Connection", "name": "read", "group": ""},

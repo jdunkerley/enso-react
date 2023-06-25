@@ -26,6 +26,11 @@ export default class Grouping {
         this.color = color
         this.displayName = displayName || name
     }
+
+    getRank(): number {
+        const rank = GROUPINGS.indexOf(this);
+        return rank === -1 ? GROUPINGS.length : rank;
+    }
 }
 
 export const DEFAULT = new Grouping('Default', '#A997AD', '')

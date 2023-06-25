@@ -4,9 +4,13 @@
     background-color: #357AB9;
     color: white;
     border-radius: 10px;
-    padding-left: 5px;
-    padding-right: 5px;
-    min-height: 20px;
-    display: inline;
+    padding: 2px 2px 2px 6px;
+    display: inline-block;
     vertical-align: middle;
+}
+
+.nodeDiv input {
+    border-width: 0;
+    border-radius: 8px;
+    padding: 2px 4px;
 }

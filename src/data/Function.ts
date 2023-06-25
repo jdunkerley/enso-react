@@ -41,9 +41,15 @@ export default class Function {
         this.aliases = aliases
     }
 
+    getDisplayText(search: string) {
+        if (search === "") return this.name
+        return this.aliases.find((alias: string) => alias.startsWith(search) || getInitials(alias).startsWith(search)) || this.name
+    }
+
     getGrouping(): Grouping {
         if (!this.grouping) {
-            this.grouping = FunctionGrouping.getGrouping(this.namespace, this.type, this.name).grouping
+            const functionGrouping = FunctionGrouping.getGrouping(this.namespace, this.type, this.name)
+            this.grouping = functionGrouping.grouping
         }
 
         return this.grouping
@@ -81,7 +87,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         } else if (fn.functionType === FunctionType.Instance) {
             if (fn.namespace !== targetNamespace || fn.type !== targetType) return false
         } else if (fn.functionType === FunctionType.Static) {
-            if (!targetNamespace || !targetType) return false
+            if (targetNamespace || targetType) return false
         }
 
         if (fn.name.startsWith(search)) return true
@@ -92,5 +98,5 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         if (fn.aliases.some((alias: string) => getInitials(alias).startsWith(search))) return true
 
         return false
-    })
+    }).sort((a: Function, b: Function) => (a.getGrouping().getRank() - b.getGrouping().getRank() ))
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './App.css'
 import { getFunctions } from './data/Function';
+import Node from './components/Node';
 import FunctionNode from './components/FunctionNode';
 
 const typeMapping: { [id:string] : [string | null, string | null] } = {
@@ -27,12 +28,18 @@ function App() {
         ))}
       </select><br />
 
-      <label htmlFor='search'>Search: </label>
-      <input type="text" value={search} onChange={e => setSearch(e.target.value)} />
+      <div style={{'display': 'table', 'backgroundColor': '#eeeeee'}}>
+        <Node>
+          <label htmlFor='search'>Search: </label>
+          <input type="text" value={search} onChange={e => setSearch(e.target.value.toLowerCase().trim())} />
+        </Node>
 
-      {funcs.map(func => (
-        <FunctionNode function={func} />
-      ))}
+        <div className='matchesList'>
+          {funcs.map(func => (
+            <FunctionNode function={func} search={search} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
