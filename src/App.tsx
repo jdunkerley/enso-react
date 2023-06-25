@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import './App.css'
-import Node from './components/Node'
 import { getFunctions } from './data/Function';
 import FunctionNode from './components/FunctionNode';
 
