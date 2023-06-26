@@ -116,6 +116,16 @@ export const FUNCTIONS: Function[] = functions.map((fn: any) => {
         fn.aliases);
 }).filter((fn: Function) => !fn.namespace.startsWith("Standard.Test") && !fn.namespace.startsWith("Standard.Examples"))
 
+function makeUnique(array: Function[], search: string) : Function[] {
+    const seen = new Set()
+    return array.filter((fn: Function) => {
+        const key = fn.getDisplayText(search)
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+    })
+}
+
 export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null): Function[] {
     var cache : { [id:string] : number | null } = {}
     const getRankNumber = (fn:Function): number | null => {
@@ -126,7 +136,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         return cache[fn.key]
     }
 
-    return FUNCTIONS.filter((fn: Function) => {
+    const raw = FUNCTIONS.filter((fn: Function) => {
         if (!fn.isPublic) return false
 
         if (fn.functionType === FunctionType.Constructor) {
@@ -161,4 +171,6 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         const bRank = (getRankNumber(b) || 1000000)
         return aRank - bRank
     })
+
+    return makeUnique(raw, search)
 }
