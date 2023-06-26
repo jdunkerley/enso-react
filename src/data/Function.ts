@@ -93,7 +93,10 @@ export default class Function {
         // Initial match
         if (this.initials.startsWith(search)) return [groupingRank + 4000 + scoreMatch(this.initials, search), this.name]
         const aliasInitials = this.aliasInitials.find((alias: string) => alias.startsWith(search))
-        if (aliasInitials) return [groupingRank + 5000 + scoreMatch(aliasInitials, search), aliasInitials]
+        if (aliasInitials) {
+            const index = this.aliasInitials.indexOf(aliasInitials)
+            return [groupingRank + 5000 + scoreMatch(aliasInitials, search), this.aliases[index]]
+        } 
     
         return null
     }
