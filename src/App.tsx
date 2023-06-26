@@ -7,9 +7,17 @@ import FunctionNode from './components/FunctionNode';
 const typeMapping: { [id:string] : [string | null, string | null] } = {
   "Static": [null, null],
   "Table": ["Standard.Table.Data.Table", "Table"],
-  "TableColumn": ["Standard.Table.Data.Column", "Column"],
-  "File": ["Standard.File", "File"],
-  "Text": ["Standard.Data.Text", "Text"]
+  "Column": ["Standard.Table.Data.Column", "Column"],
+  "DBTable": ["Standard.Table.Data.Table", "Table"],
+  "DBColumn": ["Standard.Table.Data.Column", " Column"],
+  "File": ["Standard.Base.System.File", "File"],
+  "Text": ["Standard.Base.Data.Text", "Text"],
+  "Number": ["Standard.Base.Data.Numbers", "Number"],
+  "Integer": ["Standard.Base.Data.Numbers", "Integer"],
+  "Decimal": ["Standard.Base.Data.Numbers", "Decimal"],
+  "Date": ["Standard.Base.Data.Time.Date", "Date"],
+  "Date_Time": ["Standard.Base.Data.Time.Date_Time", "Date_Time"],
+  "Time_Of_Day": ["Standard.Base.Data.Time.Time_Of_Day", "Time_Of_Day"],  
 }
 
 function App() {
@@ -24,7 +32,7 @@ function App() {
       <label htmlFor="inputType">Input Type: </label>
       <select value={inputType} onChange={e => setInputType(e.target.value)}>
         {Object.keys(typeMapping).map(key => (
-          <option value={key}>{key}</option>
+          <option key={key} value={key}>{key}</option>
         ))}
       </select><br />
 
@@ -36,7 +44,7 @@ function App() {
 
         <div className='matchesList'>
           {funcs.map(func => (
-            <FunctionNode function={func} search={search} />
+            <FunctionNode key={func.key} function={func} search={search} />
           ))}
         </div>
       </div>

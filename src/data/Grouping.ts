@@ -20,6 +20,7 @@ export default class Grouping {
     name: string
     color: string
     displayName?: string
+    rank: number | null = null
 
     constructor(name: string, color: string, displayName?: string) {
         this.name = name
@@ -28,8 +29,11 @@ export default class Grouping {
     }
 
     getRank(): number {
-        const rank = GROUPINGS.indexOf(this);
-        return rank === -1 ? GROUPINGS.length : rank;
+        if (this.rank === null) {
+            this.rank = GROUPINGS.indexOf(this);
+        }
+
+        return this.rank === -1 ? GROUPINGS.length : this.rank;
     }
 }
 

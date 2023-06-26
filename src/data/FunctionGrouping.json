@@ -472,7 +472,7 @@
     {"module": "Standard.Base.Random", "type": "Random_Number_Generator", "name": "gaussian", "group": "Data Generation"},
     {"module": "Standard.Examples.Main", "type": "", "name": "geo_data_url", "group": ""},
     {"module": "Standard.Examples.Main", "type": "", "name": "geo_json", "group": ""},
-    {"module": "Standard.Geo.Geo_Json", "type": "", "name": "geo_json_to_table", "group": "Input / Output"},
+    {"module": "Standard.Geo.Geo_Json", "type": "", "name": "geo_json_to_table", "group": ""},
     {"module": "Standard.Base.Data.Locale", "type": "Locale", "name": "germany", "group": "<Just In Type>"},
     {"module": "Standard.Base.Network.HTTP", "type": "HTTP", "name": "get", "group": "Cloud / Web"},
     {"module": "Standard.Base.Data.Text.Regex.Match", "type": "Match", "name": "get", "group": "Find / Lookup"},

@@ -9,7 +9,7 @@ type FunctionNodeProps = {
 
 const FunctionNode = (props: React.PropsWithChildren<FunctionNodeProps>) => {
     const typeName = props.function.functionType === FunctionType.Static ? '' : '.' + props.function.type
-    const title = props.function.namespace + typeName + ' :: ' + props.function.name + ' (' + props.function.functionType + ' - ' + props.function.getGrouping().name + ')'
+    const title = props.function.namespace + typeName + ' :: ' + props.function.name + ' (' + props.function.functionType + ' - ' + props.function.getGrouping().name + ': ' + props.function.getRankNumber(props.search) + ')'
     return (
         <div className="nodeDiv" style={{ backgroundColor: props.function.getGrouping().color, display: 'table', margin: '2px' }} title={title}>
             {props.function.getDisplayText(props.search)}
