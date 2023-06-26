@@ -27,6 +27,8 @@ function App() {
   const [ namespace, type ] = typeMapping[inputType]
   const funcs = getFunctions(search, namespace, type)
 
+  const [ limitHeight, setLimitHeight ] = useState(false)
+
   return (
     <div>
       <label htmlFor="inputType">Input Type: </label>
@@ -34,7 +36,11 @@ function App() {
         {Object.keys(typeMapping).map(key => (
           <option key={key} value={key}>{key}</option>
         ))}
-      </select><br />
+      </select>
+
+      <label htmlFor="limitHeight">Limit Height: </label>
+      <input type="checkbox" checked={limitHeight} onChange={e => setLimitHeight(e.target.checked)} />
+      <br />
 
       <div style={{'display': 'table', 'backgroundColor': '#eeeeee'}}>
         <Node>
@@ -42,7 +48,7 @@ function App() {
           <input type="text" value={search} onChange={e => setSearch(e.target.value.toLowerCase().trim())} />
         </Node>
 
-        <div className='matchesList'>
+        <div className='matchesList' style={{ 'maxHeight': (limitHeight ? '230px' : '') }}>
           {funcs.map(func => (
             <FunctionNode key={func.key} function={func} search={search} />
           ))}

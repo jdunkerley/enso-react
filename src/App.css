@@ -38,6 +38,5 @@
 }
 
 div.matchesList {
-  max-height: 230px;
   overflow-y: scroll;
 }

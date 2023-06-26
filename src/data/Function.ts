@@ -57,8 +57,11 @@ export default class Function {
     }
 
     getDisplayText(search: string) {
-        if (search === "") return this.name
-        return this.aliases.find((alias: string) => alias.startsWith(search) || getInitials(alias).startsWith(search)) || this.name
+        const match = this.getSearch(search)?.[1] || this.name
+        const prefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
+            ? ''
+            : (this.type || this.namespace.split(".").pop())+' '
+        return prefix + match.replaceAll("_", " ")
     }
 
     getGrouping(): Grouping {
@@ -70,27 +73,27 @@ export default class Function {
         return this.grouping
     }
 
-    getRankNumber(search:string): number | null {
+    getSearch(search:string): [number, string] | null {
         const groupingRank = this.getGrouping().getRank()
 
         function scoreMatch(match: string, search: string) : number {
-            return (match.length - search.length) * 100 / match.length
+            return Math.floor((match.length - search.length) * 100 / match.length)
         }
 
         // Starts With match
-        if (this.name.startsWith(search)) return groupingRank + scoreMatch(this.name, search)
+        if (this.name.startsWith(search)) return [groupingRank + scoreMatch(this.name, search), this.name]
         const alias = this.aliases.find((alias: string) => alias.startsWith(search))
-        if (alias) return groupingRank + 1000 + scoreMatch(alias, search)
+        if (alias) return [groupingRank + 1000 + scoreMatch(alias, search), alias]
 
         // Word match
-        if (this.name.includes("_" + search)) return groupingRank + 2000 + scoreMatch(this.name, search)
+        if (this.name.includes("_" + search)) return [groupingRank + 2000 + scoreMatch(this.name, search), this.name]
         const aliasWord = this.aliases.find((alias: string) => alias.includes("_" + search))
-        if (aliasWord) return groupingRank + 1000 + scoreMatch(aliasWord, search)
+        if (aliasWord) return [groupingRank + 1000 + scoreMatch(aliasWord, search), aliasWord]
 
         // Initial match
-        if (this.initials.startsWith(search)) return groupingRank + 4000 + scoreMatch(this.initials, search)
-        var aliasInitials = this.aliasInitials.find((alias: string) => alias.startsWith(search))
-        if (aliasInitials) return groupingRank + 5000 + scoreMatch(aliasInitials, search)
+        if (this.initials.startsWith(search)) return [groupingRank + 4000 + scoreMatch(this.initials, search), this.name]
+        const aliasInitials = this.aliasInitials.find((alias: string) => alias.startsWith(search))
+        if (aliasInitials) return [groupingRank + 5000 + scoreMatch(aliasInitials, search), aliasInitials]
     
         return null
     }
@@ -101,20 +104,20 @@ export const FUNCTIONS: Function[] = functions.map((fn: any) => {
     const fnArguments = fn.arguments
     return new Function(
         isPublic,
-        fn.module,
+        fn.module.replace(/\.Main$/, ""),
         fn.type,
         fn.name,
         fn.methodType,
         fnArguments,
         fn.returnType,
         fn.aliases);
-})
+}).filter((fn: Function) => !fn.namespace.startsWith("Standard.Test") && !fn.namespace.startsWith("Standard.Examples"))
 
 export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null): Function[] {
     var cache : { [id:string] : number | null } = {}
     const getRankNumber = (fn:Function): number | null => {
         if (cache[fn.key] === undefined) {
-            cache[fn.key] = fn.getRankNumber(search)
+            cache[fn.key] = fn.getSearch(search)?.[0] || null
         }
 
         return cache[fn.key]
@@ -128,7 +131,9 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         } else if (fn.functionType === FunctionType.Extension) {
             if (fn.type !== targetType) return false
         } else if (fn.functionType === FunctionType.Instance) {
-            if (fn.namespace !== targetNamespace || fn.type !== targetType) return false
+            var isBaseMethod = fn.type === 'Any'
+            if (!isBaseMethod && fn.type === 'Number' && targetType && ['Integer', 'Decimal'].includes(targetType)) isBaseMethod = true
+            if (!isBaseMethod && (fn.namespace !== targetNamespace || fn.type !== targetType)) return false
         } else if (fn.functionType === FunctionType.Static) {
             if (targetNamespace || targetType) return false
         }
