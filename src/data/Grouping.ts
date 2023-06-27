@@ -41,6 +41,7 @@ export const DEFAULT = new Grouping('Default', '#A997AD', '')
 
 var i: number = 0
 export const INPUT_OUTPUT = new Grouping('Input / Output', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
+export const USER_INPUT = new Grouping('Constants', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
 export const PREPARATION = new Grouping('Preparation', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
 export const JOIN_TRANSFORM = new Grouping('Join / Transform', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
 export const FIND_LOOKUP = new Grouping('Find / Lookup', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
@@ -57,6 +58,7 @@ export const ERROR_HANDLING = new Grouping('Error Handling', GROUPING_COLORS[i++
 
 const GROUPINGS: Grouping[] = [
     INPUT_OUTPUT,
+    USER_INPUT,
     PREPARATION,
     JOIN_TRANSFORM,
     FIND_LOOKUP,
