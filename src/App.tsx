@@ -21,13 +21,13 @@ const typeMapping: { [id:string] : [string | null, string | null] } = {
 }
 
 function App() {
-  const [ inputType, setInputType ] = useState("Table")
-  const [ search, setSearch ] = useState("sc")
+  const [ inputType, setInputType ] = useState("Static")
+  const [ search, setSearch ] = useState("")
 
   const [ namespace, type ] = typeMapping[inputType]
   const funcs = getFunctions(search, namespace, type)
 
-  const [ limitHeight, setLimitHeight ] = useState(false)
+  const [ limitHeight, setLimitHeight ] = useState(true)
 
   return (
     <div>
