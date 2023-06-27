@@ -38,6 +38,7 @@ export default class Function {
     aliases: string[]
     aliasInitials: string[]
     private grouping: Grouping | null = null
+    private typePrefix: string
 
     constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[]) {
         this.isPublic = isPublic
@@ -54,14 +55,15 @@ export default class Function {
 
         this.aliases = aliases
         this.aliasInitials = aliases.map(getInitials)
+
+        this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
+            ? ''
+            : (this.type || this.namespace.split(".").pop())+' '
     }
 
     getDisplayText(search: string) {
         const match = this.getSearch(search)?.[1] || this.name
-        const prefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
-            ? ''
-            : (this.type || this.namespace.split(".").pop())+' '
-        return prefix + match.replaceAll("_", " ")
+        return this.typePrefix + match.replaceAll("_", " ")
     }
 
     getGrouping(): Grouping {
@@ -79,6 +81,9 @@ export default class Function {
         function scoreMatch(match: string, search: string) : number {
             return Math.floor((match.length - search.length) * 100 / match.length)
         }
+
+        // Static should check type
+        if (this.functionType === FunctionType.Static && this.typePrefix.toLowerCase().startsWith(search)) return [groupingRank + scoreMatch(this.typePrefix, search), this.name]
 
         // Starts With match
         if (this.name.startsWith(search)) return [groupingRank + scoreMatch(this.name, search), this.name]
