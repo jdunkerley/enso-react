@@ -144,7 +144,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         } else if (fn.functionType === FunctionType.Extension) {
             if (fn.type !== targetType) return false
         } else if (fn.functionType === FunctionType.Instance) {
-            var isBaseMethod = fn.type === 'Any'
+            var isBaseMethod = targetType && fn.type === 'Any'
             if (!isBaseMethod && fn.type === 'Number' && targetType && ['Integer', 'Decimal'].includes(targetType)) isBaseMethod = true
             if (!isBaseMethod && (fn.namespace !== targetNamespace || fn.type !== targetType)) return false
         } else if (fn.functionType === FunctionType.Static) {
