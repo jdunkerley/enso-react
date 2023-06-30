@@ -79,7 +79,9 @@ export default class Function {
         const groupingRank = this.getGrouping().getRank()
 
         function scoreMatch(match: string, search: string) : number {
-            return Math.floor((match.length - search.length) * 100 / match.length)
+            const regex = new RegExp(`(^|^.*?_)(${search}[^_]*)($|_.*$)`, "i")
+            const matchWord = match.replace(regex, "$2")
+            return Math.floor((matchWord.length - search.length) * 100 / matchWord.length)
         }
 
         // Static should check type
@@ -156,6 +158,11 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
             if (targetNamespace || targetType) return false
         }
 
+        if (search.includes(".")) {
+            if (fn.functionType !== FunctionType.Static) return false
+            
+        }
+
         return getRankNumber(fn) !== null
     }).sort((a: Function, b: Function) => {
         // In the order:
@@ -174,7 +181,18 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
 
         const aRank = (getRankNumber(a) || 1000000)
         const bRank = (getRankNumber(b) || 1000000)
-        return aRank - bRank
+        if (aRank !== bRank) return aRank - bRank
+
+        if (a.functionType === FunctionType.Static && b.functionType === FunctionType.Static)
+        {
+            const aNamespace = a.namespace.split(".")[1].replace(/^Base$/, "")
+            const bNamespace = b.namespace.split(".")[1].replace(/^Base$/, "")
+            if (aNamespace !== bNamespace) return aNamespace < bNamespace ? -1 : 1
+        }
+
+        const aDisplay = a.getDisplayText(search)
+        const bDisplay = b.getDisplayText(search)
+        return aDisplay === bDisplay ? 0 : (aDisplay < bDisplay ? -1 : 1)
     })
 
     return makeUnique(raw, search)

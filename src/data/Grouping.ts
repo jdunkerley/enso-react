@@ -40,38 +40,27 @@ export default class Grouping {
 export const DEFAULT = new Grouping('Default', '#A997AD', '')
 
 var i: number = 0
-export const INPUT_OUTPUT = new Grouping('Input / Output', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const USER_INPUT = new Grouping('Constants', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const PREPARATION = new Grouping('Preparation', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const JOIN_TRANSFORM = new Grouping('Join / Transform', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const FIND_LOOKUP = new Grouping('Find / Lookup', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const DESCRIPTIVE = new Grouping('Descriptive', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const MATH = new Grouping('Math', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const TEXT = new Grouping('Text', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const DATE_TIME = new Grouping('Date / Time', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const LOGICAL = new Grouping('Logical', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const OPERATORS = new Grouping('Operators', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const PROCESS_FILE = new Grouping('Process / File', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const CLOUD_WEB = new Grouping('Cloud / Web', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const DATA_GENERATION = new Grouping('Data Generation', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-export const ERROR_HANDLING = new Grouping('Error Handling', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
-
 const GROUPINGS: Grouping[] = [
-    INPUT_OUTPUT,
-    USER_INPUT,
-    PREPARATION,
-    JOIN_TRANSFORM,
-    FIND_LOOKUP,
-    DESCRIPTIVE,
-    MATH,
-    TEXT,
-    DATE_TIME,
-    LOGICAL,
-    OPERATORS,
-    PROCESS_FILE,
-    CLOUD_WEB,
-    DATA_GENERATION,
-    ERROR_HANDLING]
+    new Grouping('Input / Output', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Constants', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Row Operations', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Column Operations', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Table Operations', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Find / Lookup', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Metadata', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Preparation', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Join / Transform', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Descriptive', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Math', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Text', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Date / Time', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Logical', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Process / File', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Cloud / Web', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Data Generation', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Operators', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Error Handling', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
+]
 
 export function getGrouping(name: string): Grouping {
     return GROUPINGS.find((grouping: Grouping) => grouping.name === name) || DEFAULT
