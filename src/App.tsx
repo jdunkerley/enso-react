@@ -8,6 +8,8 @@ const typeMapping: { [id:string] : [string | null, string | null] } = {
   "Static": [null, null],
   "Table": ["Standard.Table.Data.Table", "Table"],
   "Column": ["Standard.Table.Data.Column", "Column"],
+  "Vector": ["Standard.Base.Data.Vector", "Vector"],
+  "Array": ["Standard.Base.Data.Array", "Array"],
   "DBTable": ["Standard.Table.Data.Table", "Table"],
   "DBColumn": ["Standard.Table.Data.Column", " Column"],
   "File": ["Standard.Base.System.File", "File"],

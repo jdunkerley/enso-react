@@ -62,8 +62,9 @@ export default class Function {
     }
 
     getDisplayText(search: string) {
-        const match = this.getSearch(search)?.[1] || this.name
-        return this.typePrefix + match.replaceAll("_", " ")
+        const match = this.getSearch(search)?.[1]
+
+        return this.typePrefix + this.name + (match && match !== this.name ? ` (${match})` : "")
     }
 
     getGrouping(): Grouping {
@@ -160,7 +161,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
 
         if (search.includes(".")) {
             if (fn.functionType !== FunctionType.Static) return false
-            
+
         }
 
         return getRankNumber(fn) !== null
