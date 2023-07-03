@@ -25,6 +25,16 @@ const getInitials = (name: string): string => {
     return initials.join("")
 }
 
+export enum MatchTypeScore {
+    NameStartsWith = 0,
+    TypeStartsWith = 500,
+    AliasStartsWith = 1000,
+    NameWordMatch = 2000,
+    AliasWordMatch = 3000,
+    NameInitialMatch = 4000,
+    AliasInitialMatch = 5000
+}
+
 export default class Function {
     isPublic: boolean
     namespace: string
@@ -58,12 +68,11 @@ export default class Function {
 
         this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
             ? ''
-            : (this.type || this.namespace.split(".").pop())+' '
+            : (this.type || this.namespace.split(".").pop())+'.'
     }
 
     getDisplayText(search: string) {
         const match = this.getSearch(search)?.[1]
-
         return this.typePrefix + this.name + (match && match !== this.name ? ` (${match})` : "")
     }
 
@@ -76,34 +85,76 @@ export default class Function {
         return this.grouping
     }
 
-    getSearch(search:string): [number, string] | null {
-        const groupingRank = this.getGrouping().getRank()
+    private scoreMatch(matchType: MatchTypeScore, match: string, search: string) : number {
+        const regex = new RegExp(`(^|^.*?_)(${search}[^_]*)($|_.*$)`, "i")
+        const matchWord = match.replace(regex, "$2")
+        return matchType + Math.floor((matchWord.length - search.length) * 100 / matchWord.length) + this.getGrouping().getRank()
+    }
 
-        function scoreMatch(match: string, search: string) : number {
-            const regex = new RegExp(`(^|^.*?_)(${search}[^_]*)($|_.*$)`, "i")
-            const matchWord = match.replace(regex, "$2")
-            return Math.floor((matchWord.length - search.length) * 100 / matchWord.length)
+    getSearch(search:string,  matchType:boolean=true): [number, string] | null {
+        // Special Handling for `.` characters
+        if (search.includes(".")) {
+            if (this.functionType !== FunctionType.Static) return null
+            const idx = search.indexOf(".")
+            const type = search.substring(0, idx - 1)
+            return this.typePrefix.toLowerCase().startsWith(type) ? this.getSearch(search.substring(idx+1), false) : null
         }
 
-        // Static should check type
-        if (this.functionType === FunctionType.Static && this.typePrefix.toLowerCase().startsWith(search)) return [groupingRank + scoreMatch(this.typePrefix, search), this.name]
+        // Special Handling for `_` characters, compile to regex
+        function makeRegexMatcher(search: string) {
+            const toMatch = new RegExp("(^|_)" + search.replaceAll("_", ".*_"), "i")
+            return (text:string) => toMatch.exec(text)?.index
+        }
+
+        function makeTextMatcher(search: string) {
+            return (text:string) => {
+                if (text.startsWith(search)) {
+                    return 0
+                }
+
+                const index = text.indexOf("_" + search)
+                return index === -1 ? undefined : index
+            }
+        }
+
+        const matcher : (text:string) => (number | undefined) = search.includes("_") 
+            ? makeRegexMatcher(search)
+            : makeTextMatcher(search)
 
         // Starts With match
-        if (this.name.startsWith(search)) return [groupingRank + scoreMatch(this.name, search), this.name]
-        const alias = this.aliases.find((alias: string) => alias.startsWith(search))
-        if (alias) return [groupingRank + 1000 + scoreMatch(alias, search), alias]
+        const nameMatch = matcher(this.name)
+        if (nameMatch === 0) {
+            return [this.scoreMatch(MatchTypeScore.NameStartsWith, this.name, search), this.name]
+        }
 
-        // Word match
-        if (this.name.includes("_" + search)) return [groupingRank + 2000 + scoreMatch(this.name, search), this.name]
-        const aliasWord = this.aliases.find((alias: string) => alias.includes("_" + search))
-        if (aliasWord) return [groupingRank + 1000 + scoreMatch(aliasWord, search), aliasWord]
+        // Static Type Starts With match
+        if (matchType && this.functionType === FunctionType.Static && this.typePrefix.toLowerCase().startsWith(search)) {
+            return [this.scoreMatch(MatchTypeScore.TypeStartsWith, this.typePrefix, search), this.name]
+        } 
 
-        // Initial match
-        if (this.initials.startsWith(search)) return [groupingRank + 4000 + scoreMatch(this.initials, search), this.name]
+        // Alias Starts With match
+        const alias = this.aliases.find((alias: string) => matcher(alias) === 0)
+        if (alias) {
+            return [this.scoreMatch(MatchTypeScore.AliasStartsWith, alias, search), alias]
+        } 
+
+        // Name Word match
+        if (nameMatch) {
+            return [this.scoreMatch(MatchTypeScore.NameWordMatch, this.name, search), this.name]
+        }
+        const aliasWord = this.aliases.find((alias: string) => matcher(alias))
+        if (aliasWord) {
+            return [this.scoreMatch(MatchTypeScore.AliasWordMatch, aliasWord, search), aliasWord]
+        } 
+
+        // Initial match (no regexp here)
+        if (this.initials.startsWith(search)) {
+            return [this.scoreMatch(MatchTypeScore.NameInitialMatch, this.initials, search), this.name]
+        } 
         const aliasInitials = this.aliasInitials.find((alias: string) => alias.startsWith(search))
         if (aliasInitials) {
             const index = this.aliasInitials.indexOf(aliasInitials)
-            return [groupingRank + 5000 + scoreMatch(aliasInitials, search), this.aliases[index]]
+            return [this.scoreMatch(MatchTypeScore.AliasInitialMatch, aliasInitials, search), this.aliases[index]]
         } 
     
         return null
@@ -159,11 +210,6 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
             if (targetNamespace || targetType) return false
         }
 
-        if (search.includes(".")) {
-            if (fn.functionType !== FunctionType.Static) return false
-
-        }
-
         return getRankNumber(fn) !== null
     }).sort((a: Function, b: Function) => {
         // In the order:
@@ -196,5 +242,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         return aDisplay === bDisplay ? 0 : (aDisplay < bDisplay ? -1 : 1)
     })
 
-    return makeUnique(raw, search)
+    const result = makeUnique(raw, search)
+    console.log(search, raw, result)
+    return result
 }

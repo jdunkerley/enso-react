@@ -1253,5 +1253,20 @@
     {"module": "Standard.Table.Data.Column", "type": "Column", "name": "zip", "group": "<Just In Type>"},
     {"module": "Standard.Table.Data.Table", "type": "Table", "name": "zip", "group": "Table Operations"},
     {"module": "Standard.Base.Data.Time.Time_Of_Day", "type": "Time_Of_Day", "name": "to_seconds", "group": ""},
-    {"module": "Standard.Base.Data.Time.Time_Zone", "type": "Time_Zone", "name": "zone_id", "group": "Date / Time"}
+    {"module": "Standard.Base.Data.Time.Time_Zone", "type": "Time_Zone", "name": "zone_id", "group": "Date / Time"},
+    {"module": "Standard.Base.Data.Time.Date_Range", "type": "Date_Range", "name": "partition", "group": ""},
+    {"module": "Standard.Base.Data.Interval", "type": "Interval", "name": "new", "group": ""},
+    {"module": "Standard.Base.Data.List", "type": "List", "name": "partition", "group": ""},
+    {"module": "Standard.Base.Data.Range", "type": "Range", "name": "partition", "group": ""},
+    {"module": "Standard.Base.Data.Statistics", "type": "Vector", "name": "running_bulk", "group": ""},
+    {"module": "Standard.Base.Data.Statistics", "type": "Vector", "name": "rank_data", "group": ""},
+    {"module": "Standard.Base.Data.Vector", "type": "Vector", "name": "slice", "group": ""},
+    {"module": "Standard.Database.Data.Column", "type": "Column", "name": "decimal_div", "group": ""},
+    {"module": "Standard.Database.Data.Column", "type": "Column", "name": "decimal_mod", "group": ""},
+    {"module": "Standard.Database.Data.Column", "type": "Column", "name": "is_infinite", "group": ""},
+    {"module": "Standard.Database.Data.Column", "type": "Column", "name": "short_circuit_special_floating_point", "group": ""},
+    {"module": "Standard.Database.Internal.IR.From_Spec", "type": "Comparable", "name": "from", "group": ""},
+    {"module": "Standard.Table.Data.Type.Value_Type", "type": "Value_Type", "name": "is_decimal", "group": ""},
+    {"module": "Standard.Test.Extensions", "type": "Any", "name": "should_not_contain", "group": ""},
+    {"module": "Standard.Test.Extensions", "type": "Error", "name": "should_not_contain", "group": ""}
 ]
