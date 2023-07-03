@@ -49,6 +49,7 @@ export default class Function {
     aliasInitials: string[]
     private grouping: Grouping | null = null
     private typePrefix: string
+    private typeInitials: string
 
     constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[]) {
         this.isPublic = isPublic
@@ -69,6 +70,7 @@ export default class Function {
         this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
             ? ''
             : (this.type || this.namespace.split(".").pop())+'.'
+        this.typeInitials = getInitials(this.typePrefix).toLowerCase()
     }
 
     getDisplayText(search: string) {
@@ -146,10 +148,11 @@ export default class Function {
         } 
 
         // Initial match (no regexp here)
-        if (this.initials.startsWith(search)) {
+        var trimmed = matchType && search.startsWith(this.typeInitials) ? search.substring(this.typeInitials.length) : search
+        if (this.initials.startsWith(search) || this.initials.startsWith(trimmed)) {
             return [this.scoreMatch(MatchTypeScore.NameInitialMatch, this.initials, search), this.name]
-        } 
-        const aliasInitials = this.aliasInitials.find((alias: string) => alias.startsWith(search))
+        }
+        const aliasInitials = this.aliasInitials.find((alias: string) => alias.startsWith(search) || alias.startsWith(trimmed))
         if (aliasInitials) {
             const index = this.aliasInitials.indexOf(aliasInitials)
             return [this.scoreMatch(MatchTypeScore.AliasInitialMatch, aliasInitials, search), this.aliases[index]]
@@ -211,18 +214,15 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         return getRankNumber(fn) !== null
     }).sort((a: Function, b: Function) => {
         // In the order:
-        // If the function name starts with the search
-        // If an alias starts with the search
-        // If a word starts with the search
-        // If a word of the alias starts with the search
-        // If the initials of the function name starts with the search
-        // If the initials of the alias starts with the search
-
+        // - If the function name starts with the search
+        // - If an alias starts with the search
+        // - If a word starts with the search
+        // - If a word of the alias starts with the search
+        // - If the initials of the function name starts with the search
+        // - If the initials of the alias starts with the search
         // Number of unmatched characters in the matching name (if all matched better than if only some matched)
-
         // Group Pecking Order
-
-        // Funciton pecking order  (Advanced / Normal, value types)
+        // Function pecking order  (Advanced / Normal, value types)
 
         const aRank = (getRankNumber(a) ?? 1000000)
         const bRank = (getRankNumber(b) ?? 1000000)
@@ -240,6 +240,5 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
         return aDisplay === bDisplay ? 0 : (aDisplay < bDisplay ? -1 : 1)
     })
 
-    const result = makeUnique(raw, search)
-    return result
+    return makeUnique(raw, search)
 }

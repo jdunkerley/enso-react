@@ -29,7 +29,7 @@ function App() {
   const [ namespace, type ] = typeMapping[inputType]
   const funcs = getFunctions(search, namespace, type)
 
-  const [ limitHeight, setLimitHeight ] = useState(true)
+  const [ limitHeight, setLimitHeight ] = useState(false)
 
   return (
     <div>
