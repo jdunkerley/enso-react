@@ -86,9 +86,7 @@ export default class Function {
     }
 
     private scoreMatch(matchType: MatchTypeScore, match: string, search: string) : number {
-        const regex = new RegExp(`(^|^.*?_)(${search}[^_]*)($|_.*$)`, "i")
-        const matchWord = match.replace(regex, "$2")
-        return matchType + Math.floor((matchWord.length - search.length) * 100 / matchWord.length) + this.getGrouping().getRank()
+        return matchType + Math.floor((match.length - search.length) * 100 / match.length) + this.getGrouping().getRank()
     }
 
     getSearch(search:string,  matchType:boolean=true): [number, string] | null {
@@ -96,7 +94,7 @@ export default class Function {
         if (search.includes(".")) {
             if (this.functionType !== FunctionType.Static) return null
             const idx = search.indexOf(".")
-            const type = search.substring(0, idx - 1)
+            const type = search.substring(0, idx)
             return this.typePrefix.toLowerCase().startsWith(type) ? this.getSearch(search.substring(idx+1), false) : null
         }
 
@@ -189,7 +187,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
     var cache : { [id:string] : number | null } = {}
     const getRankNumber = (fn:Function): number | null => {
         if (cache[fn.key] === undefined) {
-            cache[fn.key] = fn.getSearch(search)?.[0] || null
+            cache[fn.key] = fn.getSearch(search)?.[0] ?? null
         }
 
         return cache[fn.key]
@@ -226,8 +224,8 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
 
         // Funciton pecking order  (Advanced / Normal, value types)
 
-        const aRank = (getRankNumber(a) || 1000000)
-        const bRank = (getRankNumber(b) || 1000000)
+        const aRank = (getRankNumber(a) ?? 1000000)
+        const bRank = (getRankNumber(b) ?? 1000000)
         if (aRank !== bRank) return aRank - bRank
 
         if (a.functionType === FunctionType.Static && b.functionType === FunctionType.Static)
@@ -243,6 +241,5 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
     })
 
     const result = makeUnique(raw, search)
-    console.log(search, raw, result)
     return result
 }
