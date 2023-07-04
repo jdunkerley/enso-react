@@ -1,46 +1,44 @@
-# Getting Started with Create React App
+# CB Search
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- Case-insensitive search
+- Search either for "word starts with" or "initials starts with". **Does not match contains within words.**
+- If not connected to anything, search within static functions and constructors.
+- If incoming, then just search within instance methods or extension methods of the type (or parent types).
+- Does not include PRIVATE, optionally includes ADVANCED/UNSTABLE.
+- Match within either names or aliases. For static methods or constructors, prefix with either the type name or module name if not in a type.
+- If search string contains a `.`, then the first part is used to search within the type (or module name). Only relevant for static methods or constructors.
+- If the search string contains a `_`, then each part represents a starts with word and must be matched in the same order they occur.
 
-## Available Scripts
+## Examples within Table:
 
-In the project directory, you can run:
+- `col` will match `columns`, `column_count`, `select_columns`.
+- `col_` will match `columns`, `column_count`, but not `select_columns` (because no following word after `col`).
+- `col_c` will match `column_count`, but not `columns` or `select_columns` (because `col` must be followed by another word starting with `c`).
+- `sc` will match `select_columns`, but not `columns` or `column_count` (because `sc` must be at the beginning of a word or initials of word).
+- `drop` will match `drop`, `drop_duplicates`, `dropna`.
 
-### `yarn start`
+## Examples within Static:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- `read` will match `Data.read`, `Image.read`, `Data.read_text`, `Environment.get`.
+- `rt` will match `Data.read_text`.
+- `drt` will match `Data.read_text`.
+- `dp` will match `Date.parse`, `Decimal.parse`.
+- `dtp` will match `Date_Time.parse`.
+- `d.` will match all methods within types starting with `d` (e.g. `Data`, `Date`, `Date_Time`).
+- `dt.` will match all methods within types starting with `dt` or with initials `dt` (e.g. `Date_Time`).
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Scoring
 
-### `yarn test`
+For ordering the search the scoring used:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- First based on type of match:
+  - Name starts with
+  - Type starts with
+  - Alias starts with
+  - Name words match but not first word
+  - Alias words match but not first word
+  - Name initials
+  - Alias initials
+- Then based on percentage of the word matched (i.e. if looking for `col` the word `column` scores higher than `columns`)
+- Then based on the group ranking
+- Final alphabetically on (`Module` or `Type` name and `Method` name)
