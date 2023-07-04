@@ -22,7 +22,7 @@ export enum FunctionType {
 const getInitials = (name: string): string => {
     const words = name.replaceAll("_", " ").split(" ")
     const initials = words.map((word: string) => word.charAt(0))
-    return initials.join("")
+    return initials.join("").toLowerCase()
 }
 
 export enum MatchTypeScore {
@@ -97,7 +97,7 @@ export default class Function {
             if (this.functionType !== FunctionType.Static) return null
             const idx = search.indexOf(".")
             const type = search.substring(0, idx)
-            return this.typePrefix.toLowerCase().startsWith(type) ? this.getSearch(search.substring(idx+1), false) : null
+            return this.typePrefix.toLowerCase().startsWith(type) || this.typeInitials.startsWith(type) ? this.getSearch(search.substring(idx+1), false) : null
         }
 
         // Special Handling for `_` characters, compile to regex
