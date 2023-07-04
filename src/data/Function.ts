@@ -88,7 +88,16 @@ export default class Function {
     }
 
     private scoreMatch(matchType: MatchTypeScore, match: string, search: string) : number {
-        return matchType + Math.floor((match.length - search.length) * 100 / match.length) + this.getGrouping().getRank()
+        var matchScore = match === search ? 0 : 50
+        if (search !== "") {
+            const pattern = new RegExp("(?:^|_)(" + search.replaceAll("_", "[^_]*).*?_(") + "[^_]*).*")
+            const matched = pattern.exec(match) ?? [""]
+            matched.shift()
+            const match_text = matched.join("_")
+            matchScore += Math.floor((match_text.length - search.length) * 50 / match_text.length)
+        }
+        
+        return (matchType + matchScore) * 100 + this.getGrouping().getRank()
     }
 
     getSearch(search:string,  matchType:boolean=true): [number, string] | null {
