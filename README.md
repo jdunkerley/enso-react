@@ -42,3 +42,25 @@ For ordering the search the scoring used:
 - Then based on percentage of the word matched (i.e. if looking for `col` the word `column` scores higher than `columns`)
 - Then based on the group ranking
 - Final alphabetically on (`Module` or `Type` name and `Method` name)
+
+## Grouping
+
+- `Input`: Read data into Enso.
+- `Constants`: Create a constant value (e.g. new table, new vector, new map).
+- `Metadata`: A property of the object (e.g. length, row_count).
+- `Output`: Output data from Enso somewhere else.
+- `Calculations`: Operations acting on the whole object producing a new object (e.g. join, aggregation).
+- `Statistics`: Statistical computation on the whole object (e.g. mean, median).
+- `Selections`: Selecting a subset of the object (e.g. filter, slice, picking columns or rows).
+- `Conversions`: Convert single values to another type (e.g. to string, to integer).
+- `Values`: Miscellaneous single value operations (e.g. fill nulls, index of).
+- `Math`: Mathematical operations on single value (e.g. square root, power).
+- `Rounding`: Rounding single value (e.g. round, floor).
+- `Trigonometry`: Trigonometric operations on single value (e.g. sin, cos).
+- `Random`: Random number generation.
+- `Bitwise`: Bitwise operations on single value (e.g. and, or).
+- `Text`: Text operations on single value (e.g. replace, to case).
+- `DateTime`: Date and time operations on single value (e.g. date part, add period).
+- `Logical`: True or false operations on single value (e.g. is empty).
+- `Operators`: All operators (e.g. add, subtract).
+- `Errors`: Handle problems (e.g. catch error, remove warnings).

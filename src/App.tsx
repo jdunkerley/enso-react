@@ -19,7 +19,9 @@ const typeMapping: { [id:string] : [string | null, string | null] } = {
   "Decimal": ["Standard.Base.Data.Numbers", "Decimal"],
   "Date": ["Standard.Base.Data.Time.Date", "Date"],
   "Date_Time": ["Standard.Base.Data.Time.Date_Time", "Date_Time"],
-  "Time_Of_Day": ["Standard.Base.Data.Time.Time_Of_Day", "Time_Of_Day"]
+  "Time_Of_Day": ["Standard.Base.Data.Time.Time_Of_Day", "Time_Of_Day"],
+  "Excel_Workbook": ["Standard.Table.Excel.Excel_Workbook", "Excel_Workbook"],
+  "Postgres_Connection": ["Standard.Database.Internal.Postgres.Postgres_Connection", "Postgres_Connection"]
 }
 
 function App() {
