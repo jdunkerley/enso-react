@@ -6,12 +6,12 @@ import FunctionNode from './components/FunctionNode';
 
 const typeMapping: { [id:string] : [string | null, string | null] } = {
   "Static": [null, null],
-  "Table": ["Standard.Table.Data.Table", "Table"],
-  "Column": ["Standard.Table.Data.Column", "Column"],
+  "Table": ["Standard.Table.Table", "Table"],
+  "Column": ["Standard.Table.Column", "Column"],
   "Vector": ["Standard.Base.Data.Vector", "Vector"],
   "Array": ["Standard.Base.Data.Array", "Array"],
-  "DBTable": ["Standard.Table.Data.Table", "Table"],
-  "DBColumn": ["Standard.Table.Data.Column", " Column"],
+  "DBTable": ["Standard.Database.DB_Table", "DB_Table"],
+  "DBColumn": ["Standard.Database.DB_Column", "DB_Column"],
   "File": ["Standard.Base.System.File", "File"],
   "Text": ["Standard.Base.Data.Text", "Text"],
   "Number": ["Standard.Base.Data.Numbers", "Number"],
