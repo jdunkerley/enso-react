@@ -54,7 +54,6 @@ const GROUPINGS: Grouping[] = [
     new Grouping('Input', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('Constants', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('Metadata', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Output', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('Calculations', GROUPING_COLORS[table_i = i++ % GROUPING_COLORS.length]), // Calculations
     new Grouping('Statistics', GROUPING_COLORS[table_i]),
     new Grouping('Selections', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
@@ -68,6 +67,7 @@ const GROUPINGS: Grouping[] = [
     new Grouping('Text', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('DateTime', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('Logical', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
+    new Grouping('Output', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('Operators', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
     new Grouping('Errors', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
 ]
