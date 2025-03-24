@@ -17,6 +17,11 @@ export default class Grouping {
 
         return this.rank === -1 ? GROUPINGS.length : this.rank;
     }
+
+    static get(name: string): Grouping {
+        const tidy_name = name.replace(/^Standard\.Base\./, '')
+        return GROUPINGS.find((grouping: Grouping) => grouping.name === tidy_name) || DEFAULT
+    }
 }
 
 export const DEFAULT = new Grouping('Default', '#A997AD', '')
@@ -58,7 +63,4 @@ const GROUPINGS: Grouping[] = [
 export const ALL_GROUP = 'All'
 export const SUGGESTED = 'Suggested'
 export const GROUPING_NAMES = [ALL_GROUP, SUGGESTED, ...GROUPINGS.map((grouping: Grouping) => grouping.name)]
-
-export function getGrouping(name: string): Grouping {
-    return GROUPINGS.find((grouping: Grouping) => grouping.name === name) || DEFAULT
-}
+export const GROUPS = ['<No Group>', ...GROUPINGS.map((grouping: Grouping) => grouping.name)]

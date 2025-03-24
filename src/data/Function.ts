@@ -1,5 +1,5 @@
 import FunctionGrouping from "./FunctionGrouping"
-import Grouping, { ALL_GROUP, SUGGESTED } from "./Grouping"
+import Grouping, { ALL_GROUP, SUGGESTED, DEFAULT } from "./Grouping"
 import functions from "./types_functions.json"
 
 export class FunctionArgument {
@@ -36,7 +36,7 @@ export enum MatchTypeScore {
 }
 
 export default class Function {
-    isPublic: boolean
+    private _isPublic: boolean
     namespace: string
     type: string
     name: string
@@ -45,15 +45,16 @@ export default class Function {
     functionType: FunctionType
     functionArguments: FunctionArgument[]
     returnType: string
-    aliases: string[]
-    aliasInitials: string[]
-    suggested: number | null
-    private grouping: Grouping | null = null
+    private _aliases: string[]
+    private aliasInitials: string[]
+    private _suggested: number | null
+    private _grouping: Grouping | null = null
     private typePrefix: string
     private typeInitials: string
+    definition: any | null
 
-    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[], suggested: number | null = null) {
-        this.isPublic = isPublic
+    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[], grouping: string | null, suggested: number | null = null, definition: any | null = null) {
+        this._isPublic = isPublic
 
         this.namespace = namespace
         this.type = type
@@ -65,10 +66,13 @@ export default class Function {
         this.functionArguments = functionArguments
         this.returnType = returnType
 
-        this.aliases = aliases
+        this._aliases = aliases
         this.aliasInitials = aliases.map(getInitials)
 
-        this.suggested = suggested
+        this._grouping = grouping == null ? null : Grouping.get(grouping)
+
+        this._suggested = suggested
+        this.definition = definition
 
         this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
             ? ''
@@ -81,13 +85,63 @@ export default class Function {
         return this.typePrefix + this.name + (match && match !== this.name ? ` (${match})` : "")
     }
 
-    getGrouping(): Grouping {
-        if (!this.grouping) {
-            const functionGrouping = FunctionGrouping.getGrouping(this.namespace, this.type, this.name)
-            this.grouping = functionGrouping.grouping
+    private functionGrouping(createIfNull:boolean=false) : FunctionGrouping | null {
+        let current = FunctionGrouping.get(this.namespace, this.type, this.name)
+        if (!current && createIfNull) {
+            current = new FunctionGrouping(
+                this.namespace, this.type, this.name, this._isPublic ? "PUBLIC" : "PRIVATE", this._grouping ?? DEFAULT, this._aliases, this._suggested)
+            current.save()
         }
+        return current
+    }
 
-        return this.grouping
+    get isPublic(): boolean {
+        return this.functionGrouping()?.isPublic() ?? this._isPublic
+    }
+
+    set isPublic(isPublic: boolean) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.accessor = isPublic ? "PUBLIC" : "PRIVATE"
+    }
+
+    get grouping(): Grouping {
+        return this.functionGrouping()?.grouping ?? this._grouping ?? DEFAULT
+    }
+
+    set grouping(grouping: Grouping) {
+        const functionGrouping = this.functionGrouping(true)
+        if (functionGrouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        functionGrouping.grouping = grouping
+    }
+
+    get aliases(): string[] {
+        return this._aliases
+    }
+
+    set aliases(alias: string[]) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.alias = alias
+        this.aliasInitials = alias.map(getInitials)
+    }
+
+    get suggested(): number | null {
+        return this.functionGrouping()?.suggested ?? this._suggested
+    }
+
+    set suggested(suggested: number | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.suggested = suggested
     }
 
     private scoreMatch(matchType: MatchTypeScore, match: string, search: string) : number {
@@ -100,7 +154,7 @@ export default class Function {
             matchScore += Math.floor((match_text.length - search.length) * 50 / match_text.length)
         }
         
-        return (matchType + matchScore) * 100 + this.getGrouping().getRank()
+        return (matchType + matchScore) * 100 + this.grouping.getRank()
     }
 
     getSearch(search:string,  matchType:boolean=true): [number, string] | null {
@@ -186,7 +240,9 @@ export const FUNCTIONS: Function[] = functions.map((fn: any) => {
         fnArguments,
         fn.returnType,
         fn.aliases,
-        fn.suggested);
+        fn.group,
+        fn.suggested,
+        fn);
 }).filter((fn: Function) => !fn.namespace.startsWith("Standard.Test") && !fn.namespace.startsWith("Standard.Examples"))
 
 function makeUnique(array: Function[], search: string) : Function[] {
@@ -206,10 +262,10 @@ export function getTypes() {
     return [null, ...new Set(filteredFunctions)];
 }
 
-export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null, grouping : string, includePrivate: boolean): Function[] {
+export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null, grouping : string, includePrivate: boolean, revision: number): Function[] {
     var cache : { [id:string] : number | null } = {}
     const getRankNumber = (fn:Function): number | null => {
-        if (grouping == SUGGESTED && (search ?? "").trim() === "") {
+        if (grouping === SUGGESTED && (search ?? "").trim() === "") {
             return fn.suggested
         }
         if (cache[fn.key] === undefined) {
@@ -226,7 +282,7 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
             if (fn.suggested === null) {
                 return false
             }
-        } else if (grouping !== ALL_GROUP && fn.getGrouping().name !== grouping) {
+        } else if (grouping !== ALL_GROUP && fn.grouping.name !== grouping) {
             return false
         }
 
