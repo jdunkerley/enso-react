@@ -1,21 +1,3 @@
-export const GROUPING_COLORS = [
-    '#F44336',
-    '#E91E63',
-    '#9C27B0',
-    '#673AB7',
-    '#3F51B5',
-    '#2196F3',
-    '#03A9F4',
-    '#00BCD4',
-    '#009688',
-    '#4CAF50',
-    '#8BC34A',
-    '#CDDC39',
-    '#FFC107',
-    '#FF9800',
-    '#FF5722'
-]
-
 export default class Grouping {
     name: string
     color: string
@@ -47,30 +29,35 @@ export const DEFAULT = new Grouping('Default', '#A997AD', '')
 // Value Operations - replace, parse, cast, etc. (one (or more) value within a row (look ahead/behind) maps to one value)
 // Positioning of Input/Output...
 
-var i: number = 0
-var math_i: number = 0
-var table_i: number = 0
 const GROUPINGS: Grouping[] = [
-    new Grouping('Input', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Constants', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Metadata', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Calculations', GROUPING_COLORS[table_i = i++ % GROUPING_COLORS.length]), // Calculations
-    new Grouping('Statistics', GROUPING_COLORS[table_i]),
-    new Grouping('Selections', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Conversions', GROUPING_COLORS[i % GROUPING_COLORS.length]),    
-    new Grouping('Values', GROUPING_COLORS[i++ % GROUPING_COLORS.length]), //Values
-    new Grouping('Math', GROUPING_COLORS[math_i = (i++ % GROUPING_COLORS.length)]),
-    new Grouping('Rounding', GROUPING_COLORS[math_i]),
-    new Grouping('Trigonmetry', GROUPING_COLORS[math_i]),
-    new Grouping('Random', GROUPING_COLORS[math_i]),
-    new Grouping('Bitwise', GROUPING_COLORS[math_i]),
-    new Grouping('Text', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('DateTime', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Logical', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Output', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Operators', GROUPING_COLORS[i++ % GROUPING_COLORS.length]),
-    new Grouping('Errors', GROUPING_COLORS[i++ % GROUPING_COLORS.length])
+    new Grouping('Input', '#ff0000'),
+    new Grouping('File', '#006d4f'), // oklch(0.464 0.14 170)
+    new Grouping('Database', '#3e6700'), // oklch(0.464 0.14 130)
+    new Grouping('Web', '#005ca2'), // oklch(0.464 0.14 245)
+    new Grouping('System', '#3c50a6'), // oklch(0.464 0.14 270)
+    new Grouping('Constants', '#0c6c1e'), // oklch(0.464 0.14 145)
+    new Grouping('Metadata', '#516200'), // oklch(0.464 0.14 120)
+    new Grouping('Output', '#ff0000'),
+    new Grouping('Calculations', '#00638d'), // oklch(0.464 0.14 230)
+    new Grouping('Statistics', '#00638d'), // oklch(0.464 0.14 230)
+    new Grouping('Selections', '#7e3783'), // oklch(0.464 0.14 325)
+    new Grouping('Conversions', '#963509'), // color: oklch(0.464 0.14 40)
+    new Grouping('Values', '#454ea6'), // oklch(0.464 0.14 275)
+    new Grouping('Math', '#66429a'), // oklch(0.464 0.14 300)
+    new Grouping('Rounding', '#66429a'), // oklch(0.464 0.14 300)
+    new Grouping('Trigonmetry', '#66429a'), // oklch(0.464 0.14 300)
+    new Grouping('Random', '#66429a'), // oklch(0.464 0.14 300)
+    new Grouping('Bitwise', '#66429a'), // oklch(0.464 0.14 300)
+    new Grouping('Text', '#5a46a1'), // oklch(0.464 0.14 290)
+    new Grouping('DateTime', '#61449e'), // oklch(0.464 0.14 295)
+    new Grouping('Logical', '#66429a'), // oklch(0.464 0.14 300)
+    new Grouping('Operators', '#454ea6'), // oklch(0.464 0.14 275)
+    new Grouping('Errors', '#972e3f'), // oklch(0.464 0.14 15)
 ]
+
+export const ALL_GROUP = 'All'
+export const SUGGESTED = 'Suggested'
+export const GROUPING_NAMES = [ALL_GROUP, SUGGESTED, ...GROUPINGS.map((grouping: Grouping) => grouping.name)]
 
 export function getGrouping(name: string): Grouping {
     return GROUPINGS.find((grouping: Grouping) => grouping.name === name) || DEFAULT

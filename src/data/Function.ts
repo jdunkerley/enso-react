@@ -1,5 +1,5 @@
 import FunctionGrouping from "./FunctionGrouping"
-import Grouping from "./Grouping"
+import Grouping, { ALL_GROUP, SUGGESTED } from "./Grouping"
 import functions from "./types_functions.json"
 
 export class FunctionArgument {
@@ -47,11 +47,12 @@ export default class Function {
     returnType: string
     aliases: string[]
     aliasInitials: string[]
+    suggested: number | null
     private grouping: Grouping | null = null
     private typePrefix: string
     private typeInitials: string
 
-    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[]) {
+    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[], suggested: number | null = null) {
         this.isPublic = isPublic
 
         this.namespace = namespace
@@ -66,6 +67,8 @@ export default class Function {
 
         this.aliases = aliases
         this.aliasInitials = aliases.map(getInitials)
+
+        this.suggested = suggested
 
         this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
             ? ''
@@ -182,7 +185,8 @@ export const FUNCTIONS: Function[] = functions.map((fn: any) => {
         fn.methodType,
         fnArguments,
         fn.returnType,
-        fn.aliases);
+        fn.aliases,
+        fn.suggested);
 }).filter((fn: Function) => !fn.namespace.startsWith("Standard.Test") && !fn.namespace.startsWith("Standard.Examples"))
 
 function makeUnique(array: Function[], search: string) : Function[] {
@@ -195,7 +199,11 @@ function makeUnique(array: Function[], search: string) : Function[] {
     })
 }
 
-export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null): Function[] {
+export function getTypes() {
+    return [null, ...new Set(FUNCTIONS.map(fn => fn.namespace + "." + fn.type))]
+}
+
+export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null, grouping : string, includePrivate: boolean): Function[] {
     var cache : { [id:string] : number | null } = {}
     const getRankNumber = (fn:Function): number | null => {
         if (cache[fn.key] === undefined) {
@@ -206,7 +214,15 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
     }
 
     const raw = FUNCTIONS.filter((fn: Function) => {
-        if (!fn.isPublic) return false
+        if (!includePrivate && !fn.isPublic) return false
+
+        if (grouping !== ALL_GROUP) {
+            if (grouping === SUGGESTED && fn.suggested === null) {
+                return false
+            } else if (fn.getGrouping().name !== grouping) {
+                return false
+            }
+        }
 
         if (fn.functionType === FunctionType.Constructor) {
             return false

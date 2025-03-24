@@ -1,50 +1,57 @@
 import React, { useState } from 'react'
 import './App.css'
-import { getFunctions } from './data/Function';
+import { getFunctions, getTypes } from './data/Function';
+import { getGrouping, GROUPING_NAMES } from './data/Grouping';
 import Node from './components/Node';
 import FunctionNode from './components/FunctionNode';
 
-const typeMapping: { [id:string] : [string | null, string | null] } = {
-  "Static": [null, null],
-  "Table": ["Standard.Table.Table", "Table"],
-  "Column": ["Standard.Table.Column", "Column"],
-  "Vector": ["Standard.Base.Data.Vector", "Vector"],
-  "Array": ["Standard.Base.Data.Array", "Array"],
-  "DBTable": ["Standard.Database.DB_Table", "DB_Table"],
-  "DBColumn": ["Standard.Database.DB_Column", "DB_Column"],
-  "File": ["Standard.Base.System.File", "File"],
-  "Text": ["Standard.Base.Data.Text", "Text"],
-  "Number": ["Standard.Base.Data.Numbers", "Number"],
-  "Integer": ["Standard.Base.Data.Numbers", "Integer"],
-  "Decimal": ["Standard.Base.Data.Numbers", "Decimal"],
-  "Date": ["Standard.Base.Data.Time.Date", "Date"],
-  "Date_Time": ["Standard.Base.Data.Time.Date_Time", "Date_Time"],
-  "Time_Of_Day": ["Standard.Base.Data.Time.Time_Of_Day", "Time_Of_Day"],
-  "Excel_Workbook": ["Standard.Table.Excel.Excel_Workbook", "Excel_Workbook"],
-  "Postgres_Connection": ["Standard.Database.Internal.Postgres.Postgres_Connection", "Postgres_Connection"]
-}
+const typeMapping: { [id:string] : [string | null, string | null] } = 
+  getTypes().reduce((acc: { [id:string]: [string | null, string | null] }, type) => {
+    if (type === null) {
+      acc["Static"] = [null, null]
+      return acc
+    }
+
+    const parts = type.match(/(.*)\.([^.]+)/)
+    if (parts !== null) {
+      acc[parts[2].toString()] = [parts[1].toString(), parts[2].toString()]
+    }
+    return acc
+  }, {})
 
 function App() {
   const [ inputType, setInputType ] = useState("Static")
   const [ search, setSearch ] = useState("")
 
-  const [ namespace, type ] = typeMapping[inputType]
-  const funcs = getFunctions(search, namespace, type)
+  const [ namespace, type ] = typeMapping[inputType] ?? ["???", "???"]
 
-  const [ limitHeight, setLimitHeight ] = useState(false)
+  const [ grouping, setGrouping ] = useState("Suggested")
+
+  const [ showPrivate, setShowPrivate ] = useState(false)
+
+  const funcs = getFunctions(search, namespace, type, grouping, showPrivate)
 
   return (
     <div>
       <label htmlFor="inputType">Input Type: </label>
-      <select value={inputType} onChange={e => setInputType(e.target.value)}>
-        {Object.keys(typeMapping).map(key => (
+      <input type="text" name="typeInput" list="typeList" value={inputType} onChange={e => setInputType(e.target.value)}></input>
+      <datalist id="typeList">
+        {Object.keys(typeMapping).sort().map(key => (
           <option key={key} value={key}>{key}</option>
         ))}
-      </select>
-
-      <label htmlFor="limitHeight">Limit Height: </label>
-      <input type="checkbox" checked={limitHeight} onChange={e => setLimitHeight(e.target.checked)} />
+      </datalist>
       <br />
+
+      <label htmlFor="grouping">Grouping: </label>
+      <select value={grouping} onChange={e => setGrouping(e.target.value)}>
+        {GROUPING_NAMES.map(key => (
+          <option key={key} value={key} style={{ 'backgroundColor': getGrouping(key)?.color}}>{key}</option>
+          ))}
+      </select>
+      <br />
+
+      <label htmlFor="showPrivate">Show Private: </label>
+      <input type="checkbox" checked={showPrivate} onChange={e => setShowPrivate(e.target.checked)} />
 
       <div style={{'display': 'table', 'backgroundColor': '#eeeeee'}}>
         <Node>
@@ -52,7 +59,7 @@ function App() {
           <input type="text" value={search} onChange={e => setSearch(e.target.value.toLowerCase().trim())} />
         </Node>
 
-        <div className='matchesList' style={{ 'maxHeight': (limitHeight ? '230px' : '') }}>
+        <div className='matchesList'>
           {funcs.map(func => (
             <FunctionNode key={func.key} function={func} search={search} />
           ))}
