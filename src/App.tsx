@@ -12,9 +12,18 @@ const typeMapping: { [id:string] : [string | null, string | null] } =
       return acc
     }
 
-    const parts = type.match(/(.*)\.([^.]+)/)
+    const parts = type.match(/^(.*)\.([^.]+)$/)
     if (parts !== null) {
-      acc[parts[2].toString()] = [parts[1].toString(), parts[2].toString()]
+      const name = parts[2].toString()
+      const namespace = parts[1].toString()
+      if (namespace.startsWith("Standard.Visualization")) {
+        return acc
+      }
+
+      if (acc[name] !== undefined && acc[name][0] !== namespace) {
+        console.error(`Duplicate type: ${name} (${type} vs ${acc[name][0]}.${acc[name][1]})`)
+      }
+      acc[name] = [namespace, name]
     }
     return acc
   }, {})
@@ -33,7 +42,7 @@ function App() {
 
   return (
     <div>
-      <label htmlFor="inputType">Input Type: </label>
+      <label htmlFor="inputType" title={namespace ?? ""}>Input Type: </label>
       <input type="text" name="typeInput" list="typeList" value={inputType} onChange={e => setInputType(e.target.value)}></input>
       <datalist id="typeList">
         {Object.keys(typeMapping).sort().map(key => (

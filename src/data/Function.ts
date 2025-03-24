@@ -200,7 +200,10 @@ function makeUnique(array: Function[], search: string) : Function[] {
 }
 
 export function getTypes() {
-    return [null, ...new Set(FUNCTIONS.map(fn => fn.namespace + "." + fn.type))]
+    const filteredFunctions = FUNCTIONS.filter(fn => fn.name !== 'from' && fn.functionType !== FunctionType.Extension)
+        .map(fn => fn.namespace + "." + fn.type)
+        .filter(fqn => fqn !== 'Standard.Base.Meta.Error' && fqn !== 'Standard.Base.Meta.Polyglot' && !fqn.includes("Extensions.") && fqn !== 'Standard.Database.Internal.IR.Context.Context' && fqn !== 'Standard.Table.Excel.Excel_Workbook.Return_As');
+    return [null, ...new Set(filteredFunctions)];
 }
 
 export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null, grouping : string, includePrivate: boolean): Function[] {
