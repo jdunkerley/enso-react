@@ -209,6 +209,9 @@ export function getTypes() {
 export function getFunctions(search: string, targetNamespace: string | null, targetType: string | null, grouping : string, includePrivate: boolean): Function[] {
     var cache : { [id:string] : number | null } = {}
     const getRankNumber = (fn:Function): number | null => {
+        if (grouping == SUGGESTED && (search ?? "").trim() === "") {
+            return fn.suggested
+        }
         if (cache[fn.key] === undefined) {
             cache[fn.key] = fn.getSearch(search)?.[0] ?? null
         }
@@ -219,12 +222,12 @@ export function getFunctions(search: string, targetNamespace: string | null, tar
     const raw = FUNCTIONS.filter((fn: Function) => {
         if (!includePrivate && !fn.isPublic) return false
 
-        if (grouping !== ALL_GROUP) {
-            if (grouping === SUGGESTED && fn.suggested === null) {
-                return false
-            } else if (fn.getGrouping().name !== grouping) {
+        if (grouping === SUGGESTED) {
+            if (fn.suggested === null) {
                 return false
             }
+        } else if (grouping !== ALL_GROUP && fn.getGrouping().name !== grouping) {
+            return false
         }
 
         if (fn.functionType === FunctionType.Constructor) {
