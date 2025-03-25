@@ -1,3 +1,4 @@
+import { isReturnStatement } from "typescript"
 import FunctionGrouping from "./FunctionGrouping"
 import Grouping, { ALL_GROUP, SUGGESTED, DEFAULT } from "./Grouping"
 import functions from "./types_functions.json"
@@ -52,9 +53,31 @@ export default class Function {
     private _icon: string | null = null
     private typePrefix: string
     private typeInitials: string
-    definition: string | null
+    description: string | null
+    args: string | null
+    returns: string | null
+    examples: string | null
+    errors: string | null
+    remarks: string | null
 
-    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[], grouping: string | null, icon: string | null, suggested: number | null = null, definition: string | null = null) {
+    constructor(
+        isPublic: boolean,
+        namespace: string,
+        type: string,
+        name: string,
+        functionType: FunctionType,
+        functionArguments: FunctionArgument[],
+        returnType: string,
+        aliases: string[],
+        grouping: string | null,
+        icon: string | null,
+        suggested: number | null = null,
+        description: string | null = null,
+        args: string | null = null,
+        returns: string | null = null,
+        examples: string | null = null,
+        errors: string | null = null,
+        remarks: string | null = null) {
         this._isPublic = isPublic
 
         this.namespace = namespace
@@ -74,7 +97,13 @@ export default class Function {
         this._icon = icon
 
         this._suggested = suggested
-        this.definition = definition
+
+        this.description = description
+        this.args = args
+        this.returns = returns
+        this.examples = examples
+        this.errors = errors
+        this.remarks = remarks
 
         this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
             ? ''
@@ -144,7 +173,6 @@ export default class Function {
 
         const sorted = alias.filter(t => t !== "").sort()
         const matches = this.aliases.length === alias.length && this.aliases.every((v, i) => v === sorted[i])
-        console.log("Matches", matches, this.aliases, alias)
         grouping.alias = matches ? null : alias
 
         this.aliasInitials = alias.map(getInitials)
@@ -261,7 +289,12 @@ export const FUNCTIONS: Function[] = functions.map((fn: any) => {
         fn.group,
         fn.icon,
         fn.suggested,
-        fn.description);
+        fn.description,
+        fn.arguments,
+        fn.returns,
+        fn.examples,
+        fn.errors,
+        fn.remarks);
 }).filter((fn: Function) => !fn.namespace.startsWith("Standard.Test") && !fn.namespace.startsWith("Standard.Examples"))
 
 function makeUnique(array: Function[], search: string) : Function[] {

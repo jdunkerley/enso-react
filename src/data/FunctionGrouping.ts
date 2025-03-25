@@ -106,7 +106,7 @@ export default class FunctionGrouping {
         }
 
         if (this.alias !== null) {
-            obj.alias = this.alias.sort()
+            obj.alias = [...this.alias].sort()
         }
 
         if (this.suggested !== null) {
@@ -125,7 +125,7 @@ function loadFromStorage() : any {
     return [];
 }
 
-const FUNCTION_GROUPINGS: FunctionGrouping[] = loadFromStorage().map((functionGrouping: any) => {
+let FUNCTION_GROUPINGS: FunctionGrouping[] = loadFromStorage().map((functionGrouping: any) => {
     return new FunctionGrouping(
         functionGrouping.module,
         functionGrouping.type,
@@ -144,4 +144,9 @@ function saveToStorage() {
 
 export function getJSON() {
     return "[" + FUNCTION_GROUPINGS.map((functionGrouping: FunctionGrouping) => functionGrouping.json()).join(",") + "]";
+}
+
+export function reset() {
+    FUNCTION_GROUPINGS = [];
+    saveToStorage();
 }

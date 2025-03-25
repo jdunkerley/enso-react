@@ -4,7 +4,7 @@ import Function, { getFunctions, getTypes } from './data/Function';
 import Grouping, { ALL_GROUP, GROUPING_NAMES, GROUPS, SUGGESTED } from './data/Grouping';
 import Node from './components/Node';
 import FunctionNode from './components/FunctionNode';
-import { getJSON } from './data/FunctionGrouping';
+import { getJSON, reset } from './data/FunctionGrouping';
 import SvgIcon from './components/SvgIcon';
 import svgIcons from './components/icons.svg';
 
@@ -48,13 +48,17 @@ function App() {
   const [ selected, setSelected ] = useState<string | null>(null)
 
   const selectedFunc = selected ? funcs.find(func => func.key === selected) : null
-  const handleAliasChange = (index: number, value: string) => {
+  const handleAliasChange = (index: number, value: string | null) => {
     if (selectedFunc) {
       const current = selectedFunc.aliases ?? []
-      if (index >= current.length) {
-        selectedFunc.aliases = [...current, value]
+      if (value === null) {
+        selectedFunc.aliases = [...current.slice(0, index), ...current.slice(index + 1)]
       } else {
-        selectedFunc.aliases = [...current.slice(0, index), value, ...current.slice(index + 1)]
+        if (index >= current.length) {
+          selectedFunc.aliases = [...current, value]
+        } else {
+          selectedFunc.aliases = [...current.slice(0, index), value, ...current.slice(index + 1)]
+        }
       }
       setRevision(revision + 1);
     }
@@ -89,6 +93,12 @@ function App() {
     document.body.removeChild(link);
   }
 
+  const handleReset = () => {
+    if (window.confirm("Are you sure you want to reset all Function Groupings?")) {
+      reset()
+      setRevision(revision + 1)
+    }
+  }
   const [ icons, setIcons ] = useState<string[]>([])
   if (icons.length === 0) {
     setIcons(["enso_logo"])
@@ -101,7 +111,8 @@ function App() {
 
   return (
     <div>
-      <button style={{'float': 'right'}} onClick={handleDownload}>Download Data</button>
+      <button style={{'float': 'right', padding: '2px', margin: '2px'}} onClick={handleReset}>Reset</button>
+      <button style={{'float': 'right', padding: '2px', margin: '2px'}} onClick={handleDownload}>Download Data</button>
       <label htmlFor="inputType">Input Type: </label>
       <input type="text" name="typeInput" list="typeList" value={inputType} onChange={e => setInputType(e.target.value)}></input>
       <datalist id="typeList">
@@ -138,7 +149,7 @@ function App() {
               ))}
           </div>
         </div>
-        <div style={{display: 'table-cell', backgroundColor: '#eeeeee', overflowY: 'auto', borderRight: '1px solid black'}}>
+        <div className='functionList'>
           <Node>
             <label htmlFor='suggested'>Reapply Suggested: </label>
             <input type="button" value="Reapply" disabled={suggestedFuncs.length > 0 && suggestedFuncs.length === suggestedFuncs[suggestedFuncs.length - 1].suggested} onClick={() => {
@@ -158,7 +169,7 @@ function App() {
           </div>
         </div>
         {selectedFunc && (
-          <div style={{'paddingLeft': '15px', 'backgroundColor': '#eeeeee', 'flex': 1, 'display': 'table'}}>
+          <div className='functionList' style={{'paddingLeft': '15px', 'flex': 1}}>
               <FunctionNode function={selectedFunc} search={search} onClick={() => setSelected(null)} /><br />
 
               <label>Namespace: {selectedFunc.namespace}</label><br />
@@ -172,7 +183,7 @@ function App() {
               <label htmlFor='grouping'>Group: </label>
               <select value={selectedFunc.grouping.name} onChange={e => { selectedFunc.grouping = Grouping.get(e.target.value); setRevision(revision + 1) }}>
                 {GROUPS.map(key => (
-                  <option key={"GRP_" + key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
+                  <option key={key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
                 ))}
               </select><br />
 
@@ -180,7 +191,7 @@ function App() {
               <SvgIcon name={selectedFunc.icon ?? "enso_logo"} />
               <select value={selectedFunc.icon ?? "enso_logo"} onChange={e => { selectedFunc.icon = e.target.value; setRevision(revision + 1) }}>
                 {icons.map(key => (
-                  <option key={"ICON_" + key} value={key}>
+                  <option key={key} value={key} data-img={key}>
                     {key}
                   </option>
                 ))}
@@ -191,13 +202,37 @@ function App() {
 
               <label htmlFor='alias'>Aliases: </label>
               {selectedFunc.aliases.map((alias, index) => (
-                <input type="text" key={index} value={alias} onChange={e => handleAliasChange(index, e.target.value)} style={{'display': 'block'}}/>
+                <div key={index} style={{display: 'flex', flexDirection: 'row'}}>
+                  <input type="text" value={alias} onChange={e => handleAliasChange(index, e.target.value)} style={{'display': 'block'}}/>
+                  <input type="button" value="⛔" onClick={() => handleAliasChange(index, null)} />
+                </div>
                 ))}
-              <input type="button" value="+" onClick={() => handleAliasChange(selectedFunc.aliases.length, "new_alias")} /><br />
+              <input type="button" value="➕" onClick={() => handleAliasChange(selectedFunc.aliases.length, "new_alias")} /><br />
               <br />
 
-              <label htmlFor='description'>Description: </label>
-              <textarea value={selectedFunc.definition ?? ""} onChange={e => { selectedFunc.definition = e.target.value; setRevision(revision + 1); }} />
+              <label htmlFor='description'>Description: </label><br/>
+              <textarea value={selectedFunc.description ?? ""} onChange={e => { selectedFunc.description = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <br />
+
+              <label htmlFor='args'>Arguments: </label><br/>
+              <textarea value={selectedFunc.args ?? ""} onChange={e => { selectedFunc.args = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <br />
+
+              <label htmlFor='returns'>Returns: </label><br/>
+              <textarea value={selectedFunc.returns ?? ""} onChange={e => { selectedFunc.returns = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <br />
+
+              <label htmlFor='examples'>Examples: </label><br/>
+              <textarea value={selectedFunc.examples ?? ""} onChange={e => { selectedFunc.examples = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <br />
+
+              <label htmlFor='errors'>Errors: </label><br/>
+              <textarea value={selectedFunc.errors ?? ""} onChange={e => { selectedFunc.errors = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <br />
+
+              <label htmlFor='remarks'>Remarks: </label><br/>
+              <textarea value={selectedFunc.remarks ?? ""} onChange={e => { selectedFunc.remarks = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <br />
           </div>
         )}
       </div>
