@@ -1,4 +1,3 @@
-import { isReturnStatement } from "typescript"
 import FunctionGrouping from "./FunctionGrouping"
 import Grouping, { ALL_GROUP, SUGGESTED, DEFAULT } from "./Grouping"
 import functions from "./types_functions.json"
@@ -37,28 +36,28 @@ export enum MatchTypeScore {
 }
 
 export default class Function {
-    private _isPublic: boolean
-    namespace: string
-    type: string
-    name: string
-    initials: string
-    key: string
-    functionType: FunctionType
-    functionArguments: FunctionArgument[]
-    returnType: string
-    private _aliases: string[]
+    private readonly _isPublic: boolean
+    readonly namespace: string
+    readonly type: string
+    readonly name: string
+    readonly initials: string
+    readonly key: string
+    readonly functionType: FunctionType
+    readonly functionArguments: FunctionArgument[]
+    readonly returnType: string
+    private readonly _aliases: string[]
     private aliasInitials: string[]
-    private _suggested: number | null
-    private _grouping: Grouping | null = null
-    private _icon: string | null = null
-    private typePrefix: string
-    private typeInitials: string
-    description: string | null
-    args: string | null
-    returns: string | null
-    examples: string | null
-    errors: string | null
-    remarks: string | null
+    private readonly _suggested: number | null
+    private readonly _grouping: Grouping | null = null
+    private readonly _icon: string | null = null
+    private readonly typePrefix: string
+    private readonly typeInitials: string
+    private readonly _description: string | null
+    private readonly _args: string | null
+    private readonly _returns: string | null
+    private readonly _examples: string | null
+    private readonly _errors: string | null
+    private readonly _remarks: string | null
 
     constructor(
         isPublic: boolean,
@@ -98,12 +97,12 @@ export default class Function {
 
         this._suggested = suggested
 
-        this.description = description
-        this.args = args
-        this.returns = returns
-        this.examples = examples
-        this.errors = errors
-        this.remarks = remarks
+        this._description = description
+        this._args = args
+        this._returns = returns
+        this._examples = examples
+        this._errors = errors
+        this._remarks = remarks
 
         this.typePrefix = this.functionType === FunctionType.Instance || this.functionType === FunctionType.Extension 
             ? ''
@@ -188,6 +187,78 @@ export default class Function {
             throw new Error("FunctionGrouping not found")
         }
         grouping.suggested = suggested
+    }
+
+    get description(): string | null {
+        return this.functionGrouping()?.description ?? this._description
+    }
+
+    set description(description: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.description = description === this._description ? null : description
+    }
+
+    get arguments(): string | null {
+        return this.functionGrouping()?.arguments ?? this._args
+    }
+
+    set arguments(args: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.arguments = args === this._args ? null : args
+    }
+
+    get returns(): string | null {
+        return this.functionGrouping()?.returns ?? this._returns
+    }
+
+    set returns(returns: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.returns = returns === this._returns ? null : returns
+    }
+
+    get examples(): string | null {
+        return this.functionGrouping()?.examples ?? this._examples
+    }
+
+    set examples(examples: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.examples = examples === this._examples ? null : examples
+    }
+
+    get errors(): string | null {
+        return this.functionGrouping()?.errors ?? this._errors
+    }
+
+    set errors(errors: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.errors = errors === this._errors ? null : errors
+    }
+
+    get remarks(): string | null {
+        return this.functionGrouping()?.remarks ?? this._remarks
+    }
+
+    set remarks(remarks: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.remarks = remarks === this._remarks ? null : remarks
     }
 
     private scoreMatch(matchType: MatchTypeScore, match: string, search: string) : number {

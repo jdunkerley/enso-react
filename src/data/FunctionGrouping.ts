@@ -9,8 +9,28 @@ export default class FunctionGrouping {
     private _grouping: Grouping | null
     private _icon: string | null
     private _suggested: number | null
+    private _description: string | null
+    private _arguments: string | null
+    private _returns: string | null
+    private _examples: string | null
+    private _errors: string | null
+    private _remarks: string | null
 
-    constructor(namespace: string, type: string, name: string, accessor: string | null = null, grouping: Grouping | null = null, icon: string | null = null, alias: string[] | null  = null, suggested: number | null = null) {
+    constructor(
+        namespace: string,
+        type: string, 
+        name: string, 
+        accessor: string | null = null, 
+        grouping: Grouping | null = null, 
+        icon: string | null = null, 
+        alias: string[] | null  = null, 
+        suggested: number | null = null, 
+        description: string | null = null,
+        args: string | null = null,
+        returns: string | null = null,
+        examples: string | null = null,
+        errors: string | null = null,
+        remarks: string | null = null) {
         this.namespace = namespace
         this.type = type
         this.name = name
@@ -19,6 +39,12 @@ export default class FunctionGrouping {
         this._icon = icon
         this._alias = alias
         this._suggested = suggested
+        this._description = description
+        this._arguments = args
+        this._returns = returns
+        this._examples = examples
+        this._errors = errors
+        this._remarks = remarks
     }
 
     isPublic(): boolean | null {
@@ -76,6 +102,60 @@ export default class FunctionGrouping {
         saveToStorage()
     }
 
+    get description(): string | null {
+        return this._description
+    }
+
+    set description(description: string | null) {
+        this._description = description
+        saveToStorage()
+    }
+
+    get arguments(): string | null {
+        return this._arguments
+    }
+
+    set arguments(args: string | null) {
+        this._arguments = args
+        saveToStorage()
+    }
+
+    get returns(): string | null {
+        return this._returns
+    }
+
+    set returns(returns: string | null) {
+        this._returns = returns
+        saveToStorage()
+    }
+
+    get examples(): string | null {
+        return this._examples
+    }
+
+    set examples(examples: string | null) {
+        this._examples = examples
+        saveToStorage()
+    }
+
+    get errors(): string | null {
+        return this._errors
+    }
+
+    set errors(errors: string | null) {
+        this._errors = errors
+        saveToStorage()
+    }
+
+    get remarks(): string | null {
+        return this._remarks
+    }
+
+    set remarks(remarks: string | null) {
+        this._remarks = remarks
+        saveToStorage()
+    }
+
     static get(namespace: string, type: string, name: string): FunctionGrouping | null {
         return FUNCTION_GROUPINGS.find((functionGrouping: FunctionGrouping) => {
             return functionGrouping.namespace === namespace && functionGrouping.type === type && functionGrouping.name === name
@@ -113,6 +193,34 @@ export default class FunctionGrouping {
             obj.suggested = this.suggested
         }
 
+        if (this.description !== null) {
+            obj.description = this.description
+        }
+
+        if (this.arguments !== null) {
+            obj.arguments = this.arguments
+        }
+
+        if (this.returns !== null) {
+            obj.returns = this.returns
+        }
+
+        if (this.examples !== null) {
+            obj.examples = this.examples
+        }
+
+        if (this.errors !== null) {
+            obj.errors = this.errors
+        }
+
+        if (this.examples !== null) {
+            obj.examples = this.examples
+        }
+
+        if (this.remarks !== null) {
+            obj.remarks = this.remarks
+        }
+
         return JSON.stringify(obj);
     }
 }
@@ -134,7 +242,13 @@ let FUNCTION_GROUPINGS: FunctionGrouping[] = loadFromStorage().map((functionGrou
         Grouping.get(functionGrouping.group),
         functionGrouping.icon,
         functionGrouping.alias,
-        functionGrouping.suggested
+        functionGrouping.suggested,
+        functionGrouping.description,
+        functionGrouping.arguments,
+        functionGrouping.returns,
+        functionGrouping.examples,
+        functionGrouping.errors,
+        functionGrouping.remarks
     )
 })
 

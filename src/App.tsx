@@ -215,7 +215,7 @@ function App() {
               <br />
 
               <label htmlFor='args'>Arguments: </label><br/>
-              <textarea value={selectedFunc.args ?? ""} onChange={e => { selectedFunc.args = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
+              <textarea value={selectedFunc.arguments ?? ""} onChange={e => { selectedFunc.arguments = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
               <br />
 
               <label htmlFor='returns'>Returns: </label><br/>
