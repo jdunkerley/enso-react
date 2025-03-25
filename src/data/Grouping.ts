@@ -39,6 +39,7 @@ const GROUPINGS: Grouping[] = [
     new Grouping('File', '#006d4f'), // oklch(0.464 0.14 170)
     new Grouping('Database', '#3e6700'), // oklch(0.464 0.14 130)
     new Grouping('Web', '#005ca2'), // oklch(0.464 0.14 245)
+    new Grouping('EnsoCloud', '#006e3e'), // oklch(0.464 0.14 160)
     new Grouping('System', '#3c50a6'), // oklch(0.464 0.14 270)
     new Grouping('Constants', '#0c6c1e'), // oklch(0.464 0.14 145)
     new Grouping('Metadata', '#516200'), // oklch(0.464 0.14 120)

@@ -1,0 +1,8 @@
+svg.SvgIcon {
+    overflow: visible; /* Prevent slight cutting off icons that are using all available space. */
+    width: 16px;
+    height: 16px;
+    transform: none;
+    transform-origin: center center;
+    margin-right: 3px;
+  }

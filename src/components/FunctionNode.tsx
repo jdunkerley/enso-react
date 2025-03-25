@@ -1,6 +1,7 @@
 import React from 'react'
 import './Node.css'
 import Function, { FunctionType } from '../data/Function'
+import SvgIcon from './SvgIcon'
 
 type FunctionNodeProps = {
     function: Function,
@@ -25,6 +26,7 @@ const FunctionNode = (props: React.PropsWithChildren<FunctionNodeProps>) => {
     }
     return (
         <div className="nodeDiv" style={{ ...style }} title={title} onClick={() => props.onClick && props.onClick()} onDoubleClick={() => props.onDoubleClick && props.onDoubleClick()}>
+            {props.function.icon && (<SvgIcon name={props.function.icon} />) }
             {props.function.getDisplayText(props.search)}
         </div>
     )

@@ -1,12 +1,13 @@
 .nodeDiv {
     font-family: 'M-PLUS-1 Code', monospace;
-    font-size: 12px;
+    font-size: 13px;
     background-color: #357AB9;
     color: white;
     border-radius: 10px;
     padding: 2px 4px 2px 6px;
     display: inline-block;
     vertical-align: middle;
+    line-height: 14px;
 }
 
 .nodeDiv input {

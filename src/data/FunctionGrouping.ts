@@ -7,14 +7,16 @@ export default class FunctionGrouping {
     private _accessor: string
     private _alias: string[]
     private _grouping: Grouping
+    private _icon: string | null
     private _suggested: number | null
 
-    constructor(namespace: string, type: string, name: string, accessor: string, grouping: Grouping, alias: string[], suggested: number | null) {
+    constructor(namespace: string, type: string, name: string, accessor: string, grouping: Grouping, icon: string | null, alias: string[], suggested: number | null) {
         this.namespace = namespace
         this.type = type
         this.name = name
         this._accessor = accessor
         this._grouping = grouping
+        this._icon = icon
         this._alias = alias
         this._suggested = suggested
     }
@@ -45,6 +47,15 @@ export default class FunctionGrouping {
     set grouping(grouping: Grouping) {
         this._grouping = grouping
         saveToStorage()  
+    }
+
+    get icon(): string | null {
+        return this._icon
+    }
+
+    set icon(icon: string | null) {
+        this._icon = icon
+        saveToStorage()
     }
 
     get alias(): string[] {
@@ -81,7 +92,8 @@ export default class FunctionGrouping {
             type: this.type,
             name: this.name,
             accessor: this.accessor,
-            group: this.grouping.name,
+            group: this.grouping.name === "Default" ? "" : this.grouping.name,
+            icon: this.icon ? this.icon : "",
             alias: this.alias,
         }
         if (this.suggested !== null) {
@@ -106,6 +118,7 @@ const FUNCTION_GROUPINGS: FunctionGrouping[] = loadFromStorage().map((functionGr
         functionGrouping.name,
         functionGrouping.accessor,
         Grouping.get(functionGrouping.group),
+        functionGrouping.icon,
         functionGrouping.alias ?? [],
         functionGrouping.suggested ?? null
     )

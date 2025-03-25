@@ -49,11 +49,12 @@ export default class Function {
     private aliasInitials: string[]
     private _suggested: number | null
     private _grouping: Grouping | null = null
+    private _icon: string | null = null
     private typePrefix: string
     private typeInitials: string
-    definition: any | null
+    definition: string | null
 
-    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[], grouping: string | null, suggested: number | null = null, definition: any | null = null) {
+    constructor(isPublic: boolean, namespace: string, type: string, name: string, functionType: FunctionType, functionArguments: FunctionArgument[], returnType: string, aliases: string[], grouping: string | null, icon: string | null, suggested: number | null = null, definition: string | null = null) {
         this._isPublic = isPublic
 
         this.namespace = namespace
@@ -70,6 +71,7 @@ export default class Function {
         this.aliasInitials = aliases.map(getInitials)
 
         this._grouping = grouping == null ? null : Grouping.get(grouping)
+        this._icon = icon
 
         this._suggested = suggested
         this.definition = definition
@@ -89,7 +91,7 @@ export default class Function {
         let current = FunctionGrouping.get(this.namespace, this.type, this.name)
         if (!current && createIfNull) {
             current = new FunctionGrouping(
-                this.namespace, this.type, this.name, this._isPublic ? "PUBLIC" : "PRIVATE", this._grouping ?? DEFAULT, this._aliases, this._suggested)
+                this.namespace, this.type, this.name, this._isPublic ? "PUBLIC" : "PRIVATE", this._grouping ?? DEFAULT, this.icon, this._aliases, this._suggested)
             current.save()
         }
         return current
@@ -117,6 +119,18 @@ export default class Function {
             throw new Error("FunctionGrouping not found")
         }
         functionGrouping.grouping = grouping
+    }
+
+    get icon(): string | null {
+        return this.functionGrouping()?.icon ?? this._icon
+    }
+
+    set icon(icon: string | null) {
+        const grouping = this.functionGrouping(true)
+        if (grouping === null) {
+            throw new Error("FunctionGrouping not found")
+        }
+        grouping.icon = icon
     }
 
     get aliases(): string[] {
@@ -241,8 +255,9 @@ export const FUNCTIONS: Function[] = functions.map((fn: any) => {
         fn.returnType,
         fn.aliases,
         fn.group,
+        fn.icon,
         fn.suggested,
-        fn);
+        fn.description);
 }).filter((fn: Function) => !fn.namespace.startsWith("Standard.Test") && !fn.namespace.startsWith("Standard.Examples"))
 
 function makeUnique(array: Function[], search: string) : Function[] {

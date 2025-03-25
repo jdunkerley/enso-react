@@ -5,6 +5,7 @@ import Grouping, { GROUPING_NAMES, GROUPS } from './data/Grouping';
 import Node from './components/Node';
 import FunctionNode from './components/FunctionNode';
 import { getJSON } from './data/FunctionGrouping';
+import SvgIcon, { IconNames } from './components/SvgIcon';
 
 const typeMapping: { [id:string] : [string | null, string | null] } = 
   getTypes().reduce((acc: { [id:string]: [string | null, string | null] }, type) => {
@@ -48,7 +49,7 @@ function App() {
   const selectedFunc = selected ? funcs.find(func => func.key === selected) : null
   const handleAliasChange = (index: number, value: string) => {
     if (selectedFunc) {
-      const current = selectedFunc.aliases
+      const current = selectedFunc.aliases ?? []
       if (index >= current.length) {
         selectedFunc.aliases = [...current, value]
       } else {
@@ -67,6 +68,15 @@ function App() {
     setRevision(revision + 1)
   }
 
+  const handleSuggestFlip = (top:number, bottom:number) => {
+    const topFunc = funcs[top]
+    const bottomFunc = funcs[bottom]
+    const topSuggest = topFunc.suggested
+    topFunc.suggested = bottomFunc.suggested
+    bottomFunc.suggested = topSuggest
+    setRevision(revision + 1)
+  }
+
   const handleDownload = () => {
     const jsonData = new Blob([getJSON()], { type: 'application/json' });
     const jsonURL = URL.createObjectURL(jsonData);
@@ -77,6 +87,8 @@ function App() {
     link.click();
     document.body.removeChild(link);
   }
+
+  const icons = IconNames()
 
   return (
     <div>
@@ -106,12 +118,26 @@ function App() {
           <Node>
             <label htmlFor='search'>Search: </label>
             <input type="text" value={search} onChange={e => setSearch(e.target.value.toLowerCase().trim())} />
-          </Node>
+          </Node><br />
+
+          {grouping === "Suggested" && funcs.length && funcs.length !== funcs[funcs.length - 1].suggested && (
+            <Node>
+              <label htmlFor='suggested'>Reapply Suggested: </label>
+              <input type="button" value="Reapply" onClick={() => {
+                funcs.forEach((func, idx) => func.suggested = idx + 1)
+                setRevision(revision + 1)
+              }} />
+            </Node>
+          )}
 
           <div className='matchesList'>
-            {funcs.map(func => (
-              <FunctionNode key={func.key} function={func} search={search} onClick={() => setSelected(func.key)} onDoubleClick={() => handleSuggestChange(func)}/>
-            ))}
+            {funcs.map((func, idx) => (
+              <div style={{'display': 'flex'}} key={func.key}>
+                <FunctionNode key={func.key} function={func} search={search} onClick={() => setSelected(func.key)} onDoubleClick={() => handleSuggestChange(func)}/>
+                {grouping === "Suggested" && (<button style={{border: 'none'}} disabled={idx === 0} onClick={() => handleSuggestFlip(idx, idx - 1)}>⬆️</button>)}
+                {grouping === "Suggested" && (<button style={{border: 'none'}} disabled={idx === funcs.length - 1} onClick={() => handleSuggestFlip(idx, idx + 1)}>⬇️</button>)}
+              </div>
+              ))}
           </div>
         </div>
         {selectedFunc && (
@@ -120,22 +146,41 @@ function App() {
 
               <label>Namespace: {selectedFunc.namespace}</label><br />
               <label>Type: {selectedFunc.type}</label><br />
+              <label>Name: {selectedFunc.name}</label><br />
+              <br />
 
               <label htmlFor='isPublic'>Is Public: </label>
               <input type="checkbox" checked={selectedFunc.isPublic} onChange={e => { selectedFunc.isPublic = e.target.checked; setRevision(revision + 1) }} /><br />
 
-              <label htmlFor='grouping'>Grouping: </label>
+              <label htmlFor='grouping'>Group: </label>
               <select value={selectedFunc.grouping.name} onChange={e => { selectedFunc.grouping = Grouping.get(e.target.value); setRevision(revision + 1) }}>
                 {GROUPS.map(key => (
                   <option key={key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
                 ))}
               </select><br />
 
+              <label htmlFor='icon'>Icon: </label>
+              <SvgIcon name={selectedFunc.icon ?? "enso_logo"} />
+              <select value={selectedFunc.icon ?? "enso_logo"} onChange={e => { selectedFunc.icon = e.target.value; setRevision(revision + 1) }}>
+                {icons.map(key => (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                ))}
+              </select><br />
+
+              {selectedFunc.suggested && (<><label>Suggested: {selectedFunc.suggested}</label><br /></>)}
+              <br/>
+
               <label htmlFor='alias'>Aliases: </label>
               {selectedFunc.aliases.map((alias, index) => (
                 <input type="text" key={index} value={alias} onChange={e => handleAliasChange(index, e.target.value)} style={{'display': 'block'}}/>
                 ))}
               <input type="button" value="+" onClick={() => handleAliasChange(selectedFunc.aliases.length, "new_alias")} /><br />
+              <br />
+
+              <label htmlFor='description'>Description: </label>
+              <textarea value={selectedFunc.definition ?? ""} onChange={e => { selectedFunc.definition = e.target.value; setRevision(revision + 1); }} />
           </div>
         )}
       </div>
