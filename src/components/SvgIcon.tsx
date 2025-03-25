@@ -14,14 +14,4 @@ const SvgIcon = (props: React.PropsWithChildren<SvgIconProps>) => {
     )
 }
 
-export function IconNames() {
-    const [iconNames, setIconNames] = React.useState<string[]>([])
-    fetch(icons).then(response => response.text()).then(text => {
-        setIconNames([...text.matchAll(/<symbol id="([^"]+)"/g)].map((match: RegExpMatchArray) => {
-            return match[1].toString()
-        }).sort())
-    })
-    return iconNames
-}
-
 export default SvgIcon

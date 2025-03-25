@@ -63,7 +63,7 @@ export default class FunctionGrouping {
     }
 
     set alias(alias: string[] | null) {
-        this._alias = alias ? alias.sort() : null
+        this._alias = alias
         saveToStorage()
     }
 
@@ -106,7 +106,7 @@ export default class FunctionGrouping {
         }
 
         if (this.alias !== null) {
-            // obj.alias = this.alias
+            obj.alias = this.alias.sort()
         }
 
         if (this.suggested !== null) {

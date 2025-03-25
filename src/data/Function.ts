@@ -129,11 +129,11 @@ export default class Function {
         if (grouping === null) {
             throw new Error("FunctionGrouping not found")
         }
-        grouping.icon = icon
+        grouping.icon = icon === this._icon ? null : icon
     }
 
     get aliases(): string[] {
-        return this._aliases
+        return this.functionGrouping()?.alias ?? this._aliases
     }
 
     set aliases(alias: string[]) {
@@ -141,7 +141,12 @@ export default class Function {
         if (grouping === null) {
             throw new Error("FunctionGrouping not found")
         }
-        grouping.alias = alias
+
+        const sorted = alias.filter(t => t !== "").sort()
+        const matches = this.aliases.length === alias.length && this.aliases.every((v, i) => v === sorted[i])
+        console.log("Matches", matches, this.aliases, alias)
+        grouping.alias = matches ? null : alias
+
         this.aliasInitials = alias.map(getInitials)
     }
 

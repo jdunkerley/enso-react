@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import './App.css'
 import Function, { getFunctions, getTypes } from './data/Function';
-import Grouping, { GROUPING_NAMES, GROUPS, SUGGESTED } from './data/Grouping';
+import Grouping, { ALL_GROUP, GROUPING_NAMES, GROUPS, SUGGESTED } from './data/Grouping';
 import Node from './components/Node';
 import FunctionNode from './components/FunctionNode';
 import { getJSON } from './data/FunctionGrouping';
-import SvgIcon, { IconNames } from './components/SvgIcon';
+import SvgIcon from './components/SvgIcon';
+import svgIcons from './components/icons.svg';
 
 const typeMapping: { [id:string] : [string | null, string | null] } = 
   getTypes().reduce((acc: { [id:string]: [string | null, string | null] }, type) => {
@@ -36,7 +37,7 @@ function App() {
 
   const [ namespace, type ] = typeMapping[inputType] ?? ["???", "???"]
 
-  const [ grouping, setGrouping ] = useState("Suggested")
+  const [ grouping, setGrouping ] = useState(ALL_GROUP)
 
   const [ showPrivate, setShowPrivate ] = useState(false)
 
@@ -88,7 +89,15 @@ function App() {
     document.body.removeChild(link);
   }
 
-  const icons = IconNames()
+  const [ icons, setIcons ] = useState<string[]>([])
+  if (icons.length === 0) {
+    setIcons(["enso_logo"])
+    fetch(svgIcons).then(response => response.text()).then(text => {
+      setIcons([...text.matchAll(/<symbol id="([^"]+)"/g)].map((match: RegExpMatchArray) => {
+            return match[1].toString()
+        }).sort())
+      })
+    }
 
   return (
     <div>
@@ -163,7 +172,7 @@ function App() {
               <label htmlFor='grouping'>Group: </label>
               <select value={selectedFunc.grouping.name} onChange={e => { selectedFunc.grouping = Grouping.get(e.target.value); setRevision(revision + 1) }}>
                 {GROUPS.map(key => (
-                  <option key={key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
+                  <option key={"GRP_" + key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
                 ))}
               </select><br />
 
@@ -171,7 +180,7 @@ function App() {
               <SvgIcon name={selectedFunc.icon ?? "enso_logo"} />
               <select value={selectedFunc.icon ?? "enso_logo"} onChange={e => { selectedFunc.icon = e.target.value; setRevision(revision + 1) }}>
                 {icons.map(key => (
-                  <option key={key} value={key}>
+                  <option key={"ICON_" + key} value={key}>
                     {key}
                   </option>
                 ))}
