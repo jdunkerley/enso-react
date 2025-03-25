@@ -168,8 +168,9 @@ function App() {
               ))}
           </div>
         </div>
-        {selectedFunc && (
-          <div className='functionList' style={{'paddingLeft': '15px', 'flex': 1}}>
+        <div className='functionList' style={{'paddingLeft': '15px', 'flex': 1}}>
+          {selectedFunc && (
+            <>
               <FunctionNode function={selectedFunc} search={search} onClick={() => setSelected(null)} /><br />
 
               <label>Namespace: {selectedFunc.namespace}</label><br />
@@ -233,14 +234,17 @@ function App() {
               <label htmlFor='remarks'>Remarks: </label><br/>
               <textarea value={selectedFunc.remarks ?? ""} onChange={e => { selectedFunc.remarks = e.target.value; setRevision(revision + 1); }} rows={5} cols={120}/>
               <br />
-          </div>
-        )}
+            </>
+          )}
+        </div>
         <div className='functionList'>
           {icons.map(key => (
-            <div key={key} style={{display: 'flex', flexDirection: 'row'}}>
+            <>
+            <Node key={key}>
               <SvgIcon name={key} />
               <label>{key}</label>
-            </div>
+            </Node><br/>
+            </>
           ))}
         </div>
       </div>
