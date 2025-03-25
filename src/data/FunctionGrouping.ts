@@ -4,13 +4,13 @@ export default class FunctionGrouping {
     namespace: string
     type: string
     name: string
-    private _accessor: string
-    private _alias: string[]
-    private _grouping: Grouping
+    private _accessor: string | null
+    private _alias: string[] | null
+    private _grouping: Grouping | null
     private _icon: string | null
     private _suggested: number | null
 
-    constructor(namespace: string, type: string, name: string, accessor: string, grouping: Grouping, icon: string | null, alias: string[], suggested: number | null) {
+    constructor(namespace: string, type: string, name: string, accessor: string | null = null, grouping: Grouping | null = null, icon: string | null = null, alias: string[] | null  = null, suggested: number | null = null) {
         this.namespace = namespace
         this.type = type
         this.name = name
@@ -31,20 +31,20 @@ export default class FunctionGrouping {
         return null
     }
 
-    get accessor(): string {
+    get accessor(): string | null {
         return this._accessor
     }
 
-    set accessor(accessor: string) {
+    set accessor(accessor: string | null) {
         this._accessor = accessor
         saveToStorage()
     }
 
-    get grouping(): Grouping {
+    get grouping(): Grouping | null {
         return this._grouping
     }
 
-    set grouping(grouping: Grouping) {
+    set grouping(grouping: Grouping | null) {
         this._grouping = grouping
         saveToStorage()  
     }
@@ -58,12 +58,12 @@ export default class FunctionGrouping {
         saveToStorage()
     }
 
-    get alias(): string[] {
+    get alias(): string[] | null {
         return this._alias
     }
 
-    set alias(alias: string[]) {
-        this._alias = alias.sort()
+    set alias(alias: string[] | null) {
+        this._alias = alias ? alias.sort() : null
         saveToStorage()
     }
 
@@ -90,15 +90,29 @@ export default class FunctionGrouping {
         var obj:any = {
             module: this.namespace,
             type: this.type,
-            name: this.name,
-            accessor: this.accessor,
-            group: this.grouping.name === "Default" ? "" : this.grouping.name,
-            icon: this.icon ? this.icon : "",
-            alias: this.alias,
+            name: this.name
         }
+
+        if (this.accessor !== null) {
+            obj.accessor = this.accessor
+        }
+
+        if (this.grouping !== null) {
+            obj.group = this.grouping.name === "Default" ? "" : this.grouping.name
+        }
+
+        if (this.icon !== null) {
+            obj.icon = this.icon
+        }
+
+        if (this.alias !== null) {
+            // obj.alias = this.alias
+        }
+
         if (this.suggested !== null) {
             obj.suggested = this.suggested
         }
+
         return JSON.stringify(obj);
     }
 }
@@ -119,8 +133,8 @@ const FUNCTION_GROUPINGS: FunctionGrouping[] = loadFromStorage().map((functionGr
         functionGrouping.accessor,
         Grouping.get(functionGrouping.group),
         functionGrouping.icon,
-        functionGrouping.alias ?? [],
-        functionGrouping.suggested ?? null
+        functionGrouping.alias,
+        functionGrouping.suggested
     )
 })
 

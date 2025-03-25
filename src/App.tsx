@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './App.css'
 import Function, { getFunctions, getTypes } from './data/Function';
-import Grouping, { GROUPING_NAMES, GROUPS } from './data/Grouping';
+import Grouping, { GROUPING_NAMES, GROUPS, SUGGESTED } from './data/Grouping';
 import Node from './components/Node';
 import FunctionNode from './components/FunctionNode';
 import { getJSON } from './data/FunctionGrouping';
@@ -43,7 +43,7 @@ function App() {
   const [ revision, setRevision ] = useState(0)
 
   const funcs = getFunctions(search, namespace, type, grouping, showPrivate, revision)
-
+  const suggestedFuncs = getFunctions("", namespace, type, SUGGESTED, false, revision)
   const [ selected, setSelected ] = useState<string | null>(null)
 
   const selectedFunc = selected ? funcs.find(func => func.key === selected) : null
@@ -69,8 +69,8 @@ function App() {
   }
 
   const handleSuggestFlip = (top:number, bottom:number) => {
-    const topFunc = funcs[top]
-    const bottomFunc = funcs[bottom]
+    const topFunc = suggestedFuncs[top]
+    const bottomFunc = suggestedFuncs[bottom]
     const topSuggest = topFunc.suggested
     topFunc.suggested = bottomFunc.suggested
     bottomFunc.suggested = topSuggest
@@ -100,42 +100,50 @@ function App() {
           <option key={key} value={key}>{key}</option>
         ))}
       </datalist>
-      <br />
 
-      <label htmlFor="grouping">Grouping: </label>
-      <select value={grouping} onChange={e => setGrouping(e.target.value)}>
-        {GROUPING_NAMES.map(key => (
-          <option key={key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
-          ))}
-      </select>
-      <br />
+      <div style={{display: 'flex', flexDirection: 'row', width: '100%'}}>
+        <div className='functionList'>
+          <Node>
+            <label htmlFor="grouping">Grouping: </label>
+            <select value={grouping} onChange={e => setGrouping(e.target.value)}>
+              {GROUPING_NAMES.map(key => (
+                <option key={key} value={key} style={{ 'backgroundColor': Grouping.get(key)?.color}}>{key}</option>
+                ))}
+            </select>
+          </Node>
+          <Node>
+            <label htmlFor="showPrivate">Show Private: </label>
+            <input type="checkbox" checked={showPrivate} onChange={e => setShowPrivate(e.target.checked)} />
+          </Node><br />
 
-      <label htmlFor="showPrivate">Show Private: </label>
-      <input type="checkbox" checked={showPrivate} onChange={e => setShowPrivate(e.target.checked)} />
-
-      <div style={{'display': 'flex', width: '100%'}}>
-        <div style={{'display': 'table', 'backgroundColor': '#eeeeee'}}>
           <Node>
             <label htmlFor='search'>Search: </label>
             <input type="text" value={search} onChange={e => setSearch(e.target.value.toLowerCase().trim())} />
           </Node><br />
 
-          {grouping === "Suggested" && funcs.length && funcs.length !== funcs[funcs.length - 1].suggested && (
-            <Node>
-              <label htmlFor='suggested'>Reapply Suggested: </label>
-              <input type="button" value="Reapply" onClick={() => {
-                funcs.forEach((func, idx) => func.suggested = idx + 1)
-                setRevision(revision + 1)
-              }} />
-            </Node>
-          )}
-
           <div className='matchesList'>
             {funcs.map((func, idx) => (
-              <div style={{'display': 'flex'}} key={func.key}>
+              <div key={func.key}>
                 <FunctionNode key={func.key} function={func} search={search} onClick={() => setSelected(func.key)} onDoubleClick={() => handleSuggestChange(func)}/>
-                {grouping === "Suggested" && (<button style={{border: 'none'}} disabled={idx === 0} onClick={() => handleSuggestFlip(idx, idx - 1)}>⬆️</button>)}
-                {grouping === "Suggested" && (<button style={{border: 'none'}} disabled={idx === funcs.length - 1} onClick={() => handleSuggestFlip(idx, idx + 1)}>⬇️</button>)}
+              </div>
+              ))}
+          </div>
+        </div>
+        <div style={{display: 'table-cell', backgroundColor: '#eeeeee', overflowY: 'auto', borderRight: '1px solid black'}}>
+          <Node>
+            <label htmlFor='suggested'>Reapply Suggested: </label>
+            <input type="button" value="Reapply" disabled={suggestedFuncs.length > 0 && suggestedFuncs.length === suggestedFuncs[suggestedFuncs.length - 1].suggested} onClick={() => {
+              suggestedFuncs.forEach((func, idx) => func.suggested = idx + 1)
+              setRevision(revision + 1)
+            }} />
+          </Node>
+
+          <div className='matchesList'>
+            {suggestedFuncs.map((func, idx) => (
+              <div key={func.key} style={{display: 'flex', flexDirection: 'row', width: '100%'}}>
+                <FunctionNode key={func.key} function={func} search={search} onClick={() => setSelected(func.key)} onDoubleClick={() => handleSuggestChange(func)}/>
+                <button style={{border: 'none', float: 'right'}} disabled={idx === 0} onClick={() => handleSuggestFlip(idx, idx - 1)}>⬆️</button>
+                <button style={{border: 'none', float: 'right'}} disabled={idx === suggestedFuncs.length - 1} onClick={() => handleSuggestFlip(idx, idx + 1)}>⬇️</button>
               </div>
               ))}
           </div>

@@ -4,10 +4,11 @@
     background-color: #357AB9;
     color: white;
     border-radius: 10px;
-    padding: 2px 4px 2px 6px;
+    padding: 2px 4px 2px 8px;
     display: inline-block;
     vertical-align: middle;
     line-height: 14px;
+    margin-right: 4px;
 }
 
 .nodeDiv input {

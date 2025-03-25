@@ -90,8 +90,7 @@ export default class Function {
     private functionGrouping(createIfNull:boolean=false) : FunctionGrouping | null {
         let current = FunctionGrouping.get(this.namespace, this.type, this.name)
         if (!current && createIfNull) {
-            current = new FunctionGrouping(
-                this.namespace, this.type, this.name, this._isPublic ? "PUBLIC" : "PRIVATE", this._grouping ?? DEFAULT, this.icon, this._aliases, this._suggested)
+            current = new FunctionGrouping(this.namespace, this.type, this.name)
             current.save()
         }
         return current
@@ -106,7 +105,7 @@ export default class Function {
         if (grouping === null) {
             throw new Error("FunctionGrouping not found")
         }
-        grouping.accessor = isPublic ? "PUBLIC" : "PRIVATE"
+        grouping.accessor = isPublic === this._isPublic ? null : (isPublic ? "PUBLIC" : "PRIVATE")
     }
 
     get grouping(): Grouping {
@@ -118,7 +117,7 @@ export default class Function {
         if (functionGrouping === null) {
             throw new Error("FunctionGrouping not found")
         }
-        functionGrouping.grouping = grouping
+        functionGrouping.grouping = grouping.name === this._grouping?.name ? null : grouping
     }
 
     get icon(): string | null {

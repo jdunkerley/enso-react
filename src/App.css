@@ -37,6 +37,15 @@
   }
 }
 
-div.matchesList {
-  overflow-y: scroll;
+.functionList {
+  background-color: #eeeeee;
+  overflow-y: auto;
+  border-right: 1px solid black;
+  max-height: 800px;
+}
+
+.matchesList {
+  border-top: 1px solid black;
+  margin-top: 3px;
+  padding-top: 3px;
 }

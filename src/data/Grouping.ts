@@ -19,7 +19,7 @@ export default class Grouping {
     }
 
     static get(name: string): Grouping {
-        const tidy_name = name.replace(/^Standard\.Base\./, '')
+        const tidy_name = name ? name.replace(/^Standard\.Base\./, '') : ""
         return GROUPINGS.find((grouping: Grouping) => grouping.name === tidy_name) || DEFAULT
     }
 }
@@ -63,5 +63,5 @@ const GROUPINGS: Grouping[] = [
 
 export const ALL_GROUP = 'All'
 export const SUGGESTED = 'Suggested'
-export const GROUPING_NAMES = [ALL_GROUP, SUGGESTED, ...GROUPINGS.map((grouping: Grouping) => grouping.name)]
+export const GROUPING_NAMES = [ALL_GROUP, ...GROUPINGS.map((grouping: Grouping) => grouping.name)]
 export const GROUPS = ['<No Group>', ...GROUPINGS.map((grouping: Grouping) => grouping.name)]
