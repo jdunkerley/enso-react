@@ -235,6 +235,14 @@ function App() {
               <br />
           </div>
         )}
+        <div className='functionList'>
+          {icons.map(key => (
+            <div key={key} style={{display: 'flex', flexDirection: 'row'}}>
+              <SvgIcon name={key} />
+              <label>{key}</label>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
